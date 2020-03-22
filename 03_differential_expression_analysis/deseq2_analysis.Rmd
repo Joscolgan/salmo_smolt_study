@@ -306,3 +306,9 @@ plotPCA(vsd, intgroup=c("phenotype"))
 plotPCA(vsd, intgroup=c("environment"))
 plotPCA(vsd, intgroup=c("maturity"))
 ```
+
+Save everything:
+
+```{r, message = FALSE}
+save.image(file = "./DESeq2_output_liver.RData")
+```
