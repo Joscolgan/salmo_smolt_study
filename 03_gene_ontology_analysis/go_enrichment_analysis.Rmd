@@ -1,0 +1,206 @@
+---
+title: "Salmo trutta: Smoltification study"
+output: GO_enrichment.html
+---
+
+# Introduction
+This script is for gene ontology (GO) enrichment analysis of differentiallly expressed genes to explore the biological processes and molecular functions associated with DE genes, using the R package 'TopGO' (https://www.bioconductor.org/packages/3.7/bioc/vignettes/topGO/inst/doc/topGO.pdf).
+Twp input files are required for the running of the test:
+1) A genelist file:
+The genelist file is a tab-delimited file containing two columns:
+Column 1: Locus (contains gene or transcript name of interest).
+Column 2: Rank value of interest (e.g. p-values or log fold changes).
+Rank values were generated using the R package, DESeq2, and implemented using code in ```gene_level_3_treatments.Rmd```.
+
+2) A GO database file:
+The GO database file is a tab-delimited file containing two columns:
+Column 1: Locus (contains gene or transcript name of interest).
+Column 2: Comma separated GO terms (e.g. GO:0000001, GO:0000002, etc.).
+
+This script will prepare data for GO analysis and create a 'TopGO object' from which enrichment tests can be performed to explore GO terms significantly enriched within the dataset.
+This script outputs a results table of significantly enriched GO terms.
+
+*It should be run once per treatment, and will produce 3 output files each time it is run*
+
+```{r message=FALSE}
+# Load libraries; install from scratch if needed
+libraries <- c("topGO",
+               "lintr",
+               "lattice")
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("topGO")
+
+for (lib in libraries) {
+    if (require(package = lib, character.only = TRUE)) {
+        print("Successful")
+    } else {
+        print("Installing")
+        source("https://bioconductor.org/biocLite.R")
+        avebiocLite(pkgs = lib)
+        library(lib, character.only = TRUE )
+    }
+}
+```
+
+## Step One: Input files, define output and objects for running topGO:
+Load in genelist and database files.
+
+
+```{r}
+## Step One:
+## Define input:
+input <- "./strutta_drerio_go_terms_filtered_converted/strutta_drerio_go_terms_filtered_converted.txt"
+
+#input <- "./results/go_term_dataset_salmo_humans.txt"
+## GO annotations
+gene_to_go_mapping_file <- input
+
+## Load file containing deseq2 output:
+load(file = "./DESeq2_output_liver.RData")
+
+## file of significant genes (3 column file: i.e. gene id, raw pvalue and adjusted p value) file:
+## We only want to keep gene id and raw p values for GO test.
+## Using adjusted p value may introduce 'edge' effects:
+
+## Change gene_file_df to either one of the following three comparisons:
+## 1) smolt_vs_non_smolts_salt_gene_pvalue
+## 2) smolt_vs_non_smolts_fresh_gene_pvalue
+## 3) non_smolt_salt_vs_non_smolts_fresh_gene_pvalue
+gene_file_df <- smolt_vs_non_smolts_salt_gene_pvalue
+
+output_file <- "smolt_vs_non_smolts_salt_gene_pvalue.txt"
+
+## Define node size:
+node_size <- 100
+database <- "strutta_drerio"
+output_directory <- paste("results/",
+                          database,
+                          "/output_",
+                          node_size,
+                          "ks_",
+                          output_file,
+                          sep = "")
+
+if (file.exists(output_directory)) {
+  stop("The output directory:", output_directory, ", already exists",
+       "Let's avoid overwriting")
+} else {
+  dir.create(output_directory,
+             recursive = TRUE)
+}
+```
+
+Read in input file:
+
+```{r, message = FALSE}
+## Read in information
+colnames(gene_file_df) <- c("locus",
+                            "raw_pvalue",
+                            "padj")
+gene_file_df$padj <- NULL
+
+## Sort by adjusted p value:
+gene_file_sorted <- gene_file_df[order(gene_file_df$raw_pvalue), ]
+## Remove na values:
+
+gene_file_sorted$locus <- gsub(pattern = "[.]1",
+                               replacement = "",
+                               gene_file_sorted$locus)
+## NA values are present for certain genes without expression, such as tRNAs:
+gene_file_sorted_filtered <- subset(x      = gene_file_sorted,
+                                   subset = !is.na(raw_pvalue))
+## Read in GO annotations:
+gene_to_go_mapping <- readMappings(file = gene_to_go_mapping_file)
+## Convert into topgo's genelist format:
+topgo_genelist        <- gene_file_sorted_filtered$raw_pvalue
+names(topgo_genelist) <- gene_file_sorted_filtered$locus
+#topgo_genelist <-  1 - topgo_genelist / max(topgo_genelist)
+# Define a cut-off for running fisher's exact test:
+cutoff_for_top_fivepercent <- quantile(x = topgo_genelist,
+                                       probs = 0.05)
+
+topgo_genelist
+```
+
+## Steps Two and Three: Create topGO Object & run tests for GO term enrichment
+
+We create a topGO object for each GO term
+
+We perform two statistical tests:
+1. A ks test using the topGO 'weight01' algorithm
+2. A Fisher's exact test using the topGO 'weight01' algoritm
+
+We combine the output of each test.
+We filter out enriched terms.
+
+We do this for each of the three GO categories (ie. Biological process, Molcular Function, Cellular Component):
+
+```{r}
+for (go_category in c("BP", "MF", "CC")) {
+  # STEP TWO
+  ## Build the GOdata object in topGO
+  my_go_data <- new("topGOdata",
+                    description = paste("GOtest", go_category, sep = "_"),
+                    ontology    = go_category,
+                    geneSel     = function(x) {
+                                   # fails to run without this
+                                     return(x <= cutoff_for_top_fivepercent)
+                                   },
+                    allGenes    = topgo_genelist,
+                    gene2GO     = gene_to_go_mapping,
+                    annot       = annFUN.gene2GO,
+                    nodeSize    = node_size) # Modify to reduce/increase stringency.
+  # STEP THREE
+  ## Calculate ks test using 'weight01' algorithm:
+  result_weight_ks <- runTest(object    = my_go_data,
+                              algorithm = "weight01",
+                              statistic = "ks")
+  ## Calculate fisher exact test using 'weight01' algorithm:
+  #result_weight_fisher <- runTest(object    = my_go_data,
+  #                                algorithm = "weight01",
+  #                                statistic = "fisher")
+  ## Combine results from statistical tests:
+  result_weight_output <- GenTable(object       = my_go_data,
+                                   weight_ks     = result_weight_ks,
+                                   #weight_fisher = result_weight_fisher,
+                                   orderBy       = "weight_ks",
+                                   topNodes      = length(score(result_weight_ks)))
+  ## Correct ks test for multiple testing:
+  result_weight_output$weight_ks <- as.numeric(result_weight_output$weight_ks)
+  #result_weight_output$weight_fisher <- as.numeric(result_weight_output$weight_fisher)
+  result_weight_output$weight_ks_adjusted <- p.adjust(p = result_weight_output$weight_ks,
+                                                      method = c("BH"))
+
+   ## Write to output:
+   write.table(x         = result_weight_output,
+              file      = file.path(output_directory,
+                                    paste(go_category,
+                                          "sig.tsv",
+                                          sep = "_")),
+              row.names = FALSE,
+              sep       = "\t",
+              quote = FALSE)
+   ## Subset specific columns as input for plotting on a barchart:
+   result_weight_for_plot <- result_weight_output[, c(1,
+                                                      2,
+                                                      3,
+                                                      7)]
+   ## Subset blanks with underscores:
+   result_weight_for_plot$Term <- gsub(pattern = " ",
+                                       replacement = "_",
+                                       result_weight_for_plot$Term)
+   
+   ## Write to output:
+   write.table(x         = result_weight_for_plot,
+              file      = file.path(output_directory,
+                                    paste(go_category,
+                                          "input_for_plot.txt",
+                                          sep = "_")),
+              row.names = FALSE,
+              sep       = "\t",
+              quote = FALSE)
+}
+```
