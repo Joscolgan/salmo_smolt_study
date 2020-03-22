@@ -1,6 +1,6 @@
-# salmo_smolt_study  
+# _Salmo_ smoltification RNA-Seq study   
 
-Context & citation:
+Context & citation:  
 This repository contains scripts for the analysis of life-history genes in the brown trout _Salmo trutta_.
 
 For the present analysis, the following steps were taken:  
