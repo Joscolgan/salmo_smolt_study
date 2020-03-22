@@ -129,15 +129,6 @@ txi <- tximport(files,
 #check class to make sure data is a list
 class(txi)
 
-## Redundant?
-## construct a DESeqDataSet from the txi object and sample information in samples.
-#dds_txi <- DESeqDataSetFromTximport(txi,
-#                                   colData = rna_sample_info_liver,
-#                                   design = ~ environment + maturity)
-
-## Possibly redundant:
-# dds <- DESeq(dds_txi)
-
 ### group factors for different comparasons
 rna_sample_info_liver$group <- paste(rna_sample_info_liver$environment,
                                      "_",
@@ -151,7 +142,7 @@ dds_txi <- DESeqDataSetFromTximport(txi,
                                    design = ~sex + group)
 
 ### using the results from above to run the DESeq analysis
-dds <- DESeq(ddsTxi,
+dds <- DESeq(dds_txi,
              test = "LRT",
              reduced = ~sex)
 ```
