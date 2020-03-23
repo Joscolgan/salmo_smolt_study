@@ -1,4 +1,8 @@
-
+--- 
+title: "Salmo smoltification study"
+output: plot_heatmap.html
+author: Joe Colgan (joscolgan)
+---
 
 ```{r, message = FALSE}
 require(ggpubr)
