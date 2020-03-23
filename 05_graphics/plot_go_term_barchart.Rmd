@@ -1,5 +1,5 @@
 --- 
-title: "Salmo sex study"
+title: "Salmo smoltification study"
 output: plot_go_term_barchart.html
 author: Joe Colgan (joscolgan)
 ---
