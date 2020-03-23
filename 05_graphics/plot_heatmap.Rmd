@@ -18,50 +18,80 @@ Examine count data:
 ```{r, message = FALSE}
 ## Normalise counts:
 normalised_counts <- t(scale(t(txi$counts),
-                                center = TRUE,
-                                scale = TRUE))
+                             center = TRUE,
+                             scale = TRUE))
 
 ## Convert to dataframe:
 normalised_counts_df <- as.data.frame(normalised_counts)
+
+## Read in sample names and assign to columns of dataframes:
+sample_info <- read.table(file = "../data/RNAseq_Sample_File_Reduced.txt",
+                          header = TRUE)
+## Extract liver samples:
+sample_info <- subset(x = sample_info,
+                      tissue == "Liver")
+
+## Update name for plotting:
+colnames(normalised_counts_df) <- paste(sample_info$sample,
+                                        "_",
+                                        sample_info$environment,
+                                        "_",
+                                        sample_info$phenotype,
+                                        sep = "")
+
+## Reorder based on phenotype:
+salt_non_smolt_samples  <- c(1, 2, 5, 6, 9, 10, 11, 14)
+salt_smolt_samples      <- c(3, 4, 7, 8, 12, 13)
+fresh_non_smolt_samples <- c(15:22)
+
+## Reorder the columns by phenotype:
+normalised_counts_reordered <- normalised_counts_df[, c(salt_non_smolt_samples,
+                                                        salt_smolt_samples,
+                                                        fresh_non_smolt_samples)]
+                                                     
+
 ```
 
-Unsure at present - there appears to be dataframes being loaded that should not!!!
-For example - dds_Non_smolt_salt_vs_non_Fresh_salt_as_df
-This dataframe is not generated in the most recent 'deseq2_analysis.Rmd' script.
-Make sure dealing with correct files and delete old scripts.
-
-Unable to load results from LRT test but using individual comparisons as an example:
+Cluster samples by similarity in gene expression profiles:
 
 ```{r, message = FALSE}
 ## First order by adjusted p value to identify the most significant genes:
-dds_Non_smolt_salt_vs_non_Fresh_salt_sorted <- dds_Non_smolt_salt_vs_non_Fresh_salt_as_df[order(dds_Non_smolt_salt_vs_non_Fresh_salt_as_df$padj), ]
+## Convert to dataframe:
+lrt_result_df <- as.data.frame(dds_salt_s_salt_ns)
+
+## Sort by adjusted p value:
+lrt_result_df_sorted <- lrt_result_df[order(lrt_result_df$padj), ]
 
 ## Extract only significant genes:
-dds_Non_smolt_salt_vs_non_Fresh_salt_sorted_sig <- subset(x = dds_Non_smolt_salt_vs_non_Fresh_salt_sorted,
-                                                          padj < 0.05)
+lrt_result_df_sorted_sig <- subset(x = lrt_result_df_sorted,
+                                   padj < 0.05)
 
 ## Subset top fifty most significant genes:
-dds_Non_smolt_salt_vs_non_Fresh_salt_sorted_sig <- head(dds_Non_smolt_salt_vs_non_Fresh_salt_sorted_sig,
-                                                        n = 100)
+lrt_result_df_sorted_sig <- head(lrt_result_df_sorted_sig,
+                                 n = 50)
 
 ## Extract gene ids:
-dds_Non_smolt_salt_vs_non_Fresh_salt_sig_gene_ids <- row.names(dds_Non_smolt_salt_vs_non_Fresh_salt_sorted_sig)
+lrt_result_df_sorted_sig_gene_ids <- row.names(lrt_result_df_sorted_sig)
 ```
 
 Extract normalised counts for genes of interest:
 
 ```{r, message = FALSE}
-dds_Non_smolt_salt_vs_non_Fresh_salt_sig_counts <- normalised_counts_df[match(dds_Non_smolt_salt_vs_non_Fresh_salt_sig_gene_ids,
-                                                                              row.names(normalised_counts_df)), ]
-dds_Non_smolt_salt_vs_non_Fresh_salt_sig_counts$gene_id <- row.names(dds_Non_smolt_salt_vs_non_Fresh_salt_sig_counts)
+## Subset rows containing gene names of interest:
+lrt_result_df_sorted_sig_counts <- normalised_counts_reordered[match(lrt_result_df_sorted_sig_gene_ids,
+                                                              row.names(normalised_counts_reordered)), ]
+lrt_result_df_sorted_sig_counts$gene_id <- row.names(lrt_result_df_sorted_sig_counts)
 
 ## Cluster based on euclidean distance:
-dd <- hclust(dist(as.matrix(dds_Non_smolt_salt_vs_non_Fresh_salt_sig_counts[, 1:22])))
+dd <- hclust(dist(as.matrix(lrt_result_df_sorted_sig_counts[, 1:22])))
 
-normalised_counts_ordered <- as.data.frame(dds_Non_smolt_salt_vs_non_Fresh_salt_sig_counts[dd$order, ])
+## Reorder:
+normalised_counts_ordered <- as.data.frame(lrt_result_df_sorted_sig_counts[dd$order, ])
 
+## Transform dataframe:
 normalised_counts_ordered_melt <- melt(normalised_counts_ordered)
 
+## Update column names:
 colnames(normalised_counts_ordered_melt) <- c("gene_name",
                                                       "sample",
                                                       "normalised_counts")
@@ -79,7 +109,7 @@ Plot heatmap:
 input <- normalised_counts_ordered_melt
 
 ## Generate heatmap:
-ggplot(input, aes(sample, gene_name)) +
+heatmap <- ggplot(input, aes(sample, gene_name)) +
                                 geom_tile(aes(fill = normalised_counts)) +
                                 #geom_vline(xintercept = c(0.5, 4.5, 8.5)) +
                                 scale_fill_gradient2(low = "black",
@@ -87,12 +117,17 @@ ggplot(input, aes(sample, gene_name)) +
                                                      high = "red") +
                                 ylab("") +
                                 xlab("") +
+         geom_vline(xintercept = c(8.5, 14.5, 22.5)) +
                                 theme(legend.title = element_text(size = 10,
                                                         face = "bold"),
                                       legend.text = element_text(size = 10,
                                                         face = "bold"),
-                                      axis.text.x = element_blank(),
-                                      axis.text.y = element_text(size = 10,
+                                      axis.text.x = element_text(size = 6,
+                                                        face = "plain",
+                                                        colour = "black",
+                                                        angle = 45,
+                                                        hjust = 1),
+                                      axis.text.y = element_text(size = 6,
                                                         face = "plain",
                                                         colour = "black"),
                                       axis.title = element_text(size = 10,
@@ -102,17 +137,11 @@ ggplot(input, aes(sample, gene_name)) +
                                       panel.background = element_blank(),
                                       legend.position = "top") +
                                 scale_y_discrete(position = "right") +
-                                labs(fill = "Normalised gene expression") +
-                                theme(axis.text.y = element_text(face = c(rep("plain", 4),
-                                                                            "bold.italic",
-                                                                            rep("plain", 10),
-                                                                            "bold.italic",
-                                                                            rep("plain", 6),
-                                                                            "bold",
-                                                                            rep("plain", 31),
-                                                                            "italic")))
+                                labs(fill = "Normalised gene expression")
 ```
+
 Run lintr:
+
 ```{r, message = FALSE}
 lintr::lint(file = "./plot_heatmap.Rmd")
 ```
