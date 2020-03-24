@@ -74,6 +74,11 @@ gene_file_df <- smolt_vs_non_smolts_salt_gene_pvalue
 
 output_file <- "smolt_vs_non_smolts_salt_gene_pvalue.txt"
 
+## Update output file name to remove file extension:
+output_file <- gsub(pattern = "_gene_pvalue.txt",
+                    replacement = "",
+                    x = output_file)
+
 ## Define node size:
 node_size <- 100
 database <- "strutta_drerio"
