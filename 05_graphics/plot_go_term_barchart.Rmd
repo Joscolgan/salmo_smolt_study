@@ -37,10 +37,12 @@ results <- "./results/strutta_drerio/output_100ks_smolt_vs_non_smolts_salt/"
 bp_terms <- read.table(file = paste(results,
                                     "BP_input_for_plot.txt",
                                     sep = ""),
-                       col.names = c("go_term",
-                                     "go_description",
-                                     "go_number",
-                                     "adjusted_p"))
+                                    header = TRUE)
+colnames(bp_terms) = c("go_term",
+                       "go_description",
+                       "go_number",
+                       "adjusted_p")
+                       
 ## Subset significant values:
 bp_terms <- subset(bp_terms,
                    adjusted_p < 0.05)
@@ -50,10 +52,12 @@ bp_terms$category <- "BP"
 mf_terms <- read.table(file = paste(results,
                                     "MF_input_for_plot.txt",
                                     sep = ""),
-                       col.names = c("go_term",
-                                     "go_description",
-                                     "go_number",
-                                     "adjusted_p"))
+                                    header = TRUE)
+colnames(mf_terms) = c("go_term",
+                       "go_description",
+                       "go_number",
+                       "adjusted_p")
+                      
 ## Subset significant values:
 mf_terms <- subset(mf_terms,
                    adjusted_p < 0.05)
@@ -63,10 +67,12 @@ mf_terms$category <- "MF"
 cc_terms <- read.table(file = paste(results,
                                     "CC_input_for_plot.txt",
                                     sep = ""),
-                       col.names = c("go_term",
-                                     "go_description",
-                                     "go_number",
-                                     "adjusted_p"))
+                                    header = TRUE)
+colnames(cc_terms) = c("go_term",
+                       "go_description",
+                       "go_number",
+                       "adjusted_p")
+                       
 ## Subset significant values:
 cc_terms <- subset(cc_terms,
                    adjusted_p < 0.05)
