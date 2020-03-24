@@ -1,6 +1,6 @@
 ---
-title: "title: "Salmo smoltification study""
-output: GO_enrichment.html
+title: "Salmo smoltification study""
+output: go_enrichment_analysis.html
 author: Joe Colgan (joscolgan)  
 ---
 
