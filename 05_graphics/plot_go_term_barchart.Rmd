@@ -31,7 +31,7 @@ dir.create("results")
 
 ```{r, message = FALSE}
 ## Read in input:
-results <- "./results/strutta_strutta/output_100_fisher_all/"
+results <- "./results/strutta_drerio/output_100ks_smolt_vs_non_smolts_salt/"
 
 ## Read in biological process terms:
 bp_terms <- read.table(file = paste(results,
