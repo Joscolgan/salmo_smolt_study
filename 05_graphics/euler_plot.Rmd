@@ -1,0 +1,102 @@
+
+## Here include some basic information
+## Name of author:Robert Wynne
+## Date:24/01/2020
+## Program name: .Rmd
+## Purpose of the script: plot euler
+## This script does XX, YYY and ZZZ.
+##
+## Mention what it takes as input
+##
+## It outputs... - We can work on this when I get back.
+
+First step, load library required for plotting:
+
+```{r, message = FALSE}
+##install.packages("eulerr")
+library(eulerr)
+library(ggplot2)
+```
+
+Next, load input data:
+
+```{r, message = FALSE}
+load(file = "DESeq2_output_liver.RData")
+```
+
+Create a list of comparisons to plot:
+
+```{r, message = FALSE}
+vendiagram <- euler(combinations = list("Smolt vs Non Smolt saltwater" = smolt_vs_non_smolts_salt_lrt_wald,
+                                        "Non Smolt saltwater vs Non Smolt freshwater" = smolt_vs_non_smolts_fresh_lrt_wald,
+                                        "Smolt vs Non Smolt freshwater" = non_smolt_salt_vs_non_smolts_fresh_lrt_wald))
+```
+
+Plot Venn diagram
+
+```{r, message = FALSE}
+plot(vendiagram,
+     quantities = TRUE,
+     edges = TRUE)
+
+## Save image to file:
+dir.create(path = "./euler_plots")
+ggsave(filename = "./euler_plots/comparison_degs.png",
+       width = 5,
+       height = 5)
+```
+
+
+############## Potential code to "burn" - remove!
+length(dds_smolt_vs_non_Smolt_salt_gene_list)
+length(dds_Non_smolt_salt_vs_non_Fresh_salt_as_df_gene_list)
+length(dds_smolt_vs_non_Smolt_fresh_as_df_gene_list)
+
+dds_smolt_vs_non_Smolt_fresh_as_df_gene_list
+                                        
+                                        
+class(vendiagram)
+
+head(vendiagram$original.values)
+
+table(c(dds_smolt_vs_non_Smolt_salt_gene_list,
+  dds_Non_smolt_salt_vs_non_Fresh_salt_as_df_gene_list))
+
+
+vendiagram$original.values
+
+########################################################
+
+
+
+### Test run post go enrichment
+
+## gen
+##
+##  Biological processes (100k)
+df_non_smolt_salt_vs_non_smolt_fresh_significant_genes_BP <- as.data.frame(non_smolt_salt_vs_non_smolt_fresh_significant_genes_BP)
+df_smolt_salt_vs_non_smolt_salt_significant_genes_pvalue_BP <-as.data.frame(smolt_salt_vs_non_smolt_salt_significant_genes_pvalue_BP)
+df_smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP <-as.data.frame(smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP)
+
+head(non_smolt_salt_vs_non_smolt_fresh_significant_genes_BP)
+head(smolt_salt_vs_non_smolt_salt_significant_genes_pvalue_BP)
+head(smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP)
+
+df_smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP
+
+vendiagram2 <- euler(combinations = list("Smolt vs Non Smolt saltwater"= smolt_salt_vs_non_smolt_salt_significant_genes_pvalue_BP,
+                                        "Non Smolt saltwater vs Non Smolt freshwater" =non_smolt_salt_vs_non_smolt_fresh_significant_genes_BP,
+                                        "Smolt vs Non Smolt freshwater" = smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP))
+
+
+plot(vendiagram2, quantities = TRUE, edges = TRUE)
+
+class(vendiagram)
+
+head(vendiagram$original.values)
+
+table(c(dds_smolt_vs_non_Smolt_salt_gene_list,
+        dds_Non_smolt_salt_vs_non_Fresh_salt_as_df_gene_list))
+
+
+vendiagram$original.values
