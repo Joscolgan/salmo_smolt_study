@@ -105,15 +105,6 @@ files_liver_df <- subset(files_df,
 rna_sample_info_liver <- subset(rna_sample_info,
                                 tissue == "Liver")
 
-
-## CHECK IF REDUNDANT - IF SO REMOVE
-## create a factor from the sample file.
-#file <- files_liver_df$files
-
-## create a list of sample names.
-#names(file) <- RNAsamples_liver$sample
-#names(file)
-
 ## specify the path to the files using the appropriate columns of samples
 ## also need to link transcripts to genes for this dataset:
 tx2gene <- read.table("./RNASEQ/combined_transcript_to_gene.txt")
@@ -138,7 +129,7 @@ rna_sample_info_liver$group <- paste(rna_sample_info_liver$environment,
 ### input values and create intermediate calculations and results of an analysis of differential expression looking at sex and
 ### 'group'(a constructed column combining phenotype and enviornment).
 dds_txi <- DESeqDataSetFromTximport(txi,
-                                   colData = RNAsamples_liver,
+                                   colData = rna_sample_info_liver,
                                    design = ~sex + group)
 
 ### using the results from above to run the DESeq analysis
@@ -174,6 +165,16 @@ dds_fresh_ns_salt_ns <- results(dds,
                                 contrast = c("group",
                                              "salt_NonSmolt",
                                              "fresh_NonSmolt"))
+
+## LRT significant genes:
+lrt_raw_df <- as.data.frame(dds_salt_s_salt_ns)
+
+## Subset differentially expressed genes:
+lrt_raw_padj <- subset(lrt_raw_df,
+                       padj < 0.05)
+
+## Extract gene identifiers, which are stored as row names:
+lrt_sig_genes <- row.names(lrt_raw_padj)
 ```
 
 We also want to perform Wald test between comparisons and take genes identified by both approaches as differentially expressed between groups as indentified by the LRT.
@@ -181,8 +182,7 @@ We also want to perform Wald test between comparisons and take genes identified 
 ```{r, message = FALSE}
 ### Run a Wald test:
 dds_wald <- DESeq(dds_txi,
-             test = "Wald",
-             prior = TRUE)
+             test = "Wald")
 ```
 
 Extract group comparisons similar to above for the LRTs:
@@ -215,16 +215,16 @@ Count the number of differentally expressed genes between the groups
 
 ```{r, message = FALSE}
 ## create dataframe of gene list, subsetting the p.value
-##count rows
+## count rows
 nrow(dds_salt_smolt_vs_salt_non_smolt)
+nrow(dds_salt_smolt_vs_fresh_non_smolt)
 nrow(dds_salt_non_smolt_vs_fresh_non_smolt)
-nrow(dds_non_smolt_salt_vs_non_smolt_fresh)
 
 ## The 'results' function of DESeq2 outputs a table with data format similar to a dataframe but
 ## not exactly the same. Therefore, convert these files into dataframes:
-smolt_vs_non_smolts_salt_df <- as.data.frame(dds_salt_smolt_vs_salt_non_smolt)
-smolt_vs_non_smolts_fresh_df <- as.data.frame(dds_salt_smolt_vs_fresh_non_smolt)
-non_smolt_salt_vs_non_smolts_fresh_df <- as.data.frame(dds_salt_smolt_vs_fresh_non_smolt)
+smolt_vs_non_smolts_salt_df           <- as.data.frame(dds_salt_smolt_vs_salt_non_smolt)
+smolt_vs_non_smolts_fresh_df          <- as.data.frame(dds_salt_smolt_vs_fresh_non_smolt)
+non_smolt_salt_vs_non_smolts_fresh_df <- as.data.frame(dds_salt_non_smolt_vs_fresh_non_smolt)
 ```
 
 Subset significant genes for each comparison:
@@ -234,7 +234,7 @@ smolt_vs_non_smolts_salt_sig  <- subset(smolt_vs_non_smolts_salt_df,
                                         padj < 0.05)
 smolt_vs_non_smolts_fresh_sig <- subset(smolt_vs_non_smolts_fresh_df,
                                         padj < 0.05)
-non_smolt_salt_vs_non_smolts_fresh_sig <- subset(smolt_vs_non_smolts_fresh_df,
+non_smolt_salt_vs_non_smolts_fresh_sig <- subset(non_smolt_salt_vs_non_smolts_fresh_df,
                                                  padj < 0.05)
 ```
 
@@ -269,10 +269,32 @@ colnames(non_smolt_salt_vs_non_smolts_fresh_gene_pvalue) <- c("locus",
                                                     "padj")
 ```
 
-Save everyting:
+Check overlap between LRT and Wald tests:
 
 ```{r, message = FALSE}
-save.image(file = "./DESeq2_output_liver.RData")
+## Extract genes identified as significant by both LRT and Wald:
+smolt_vs_non_smolts_salt_lrt_wald <- row.names(subset(smolt_vs_non_smolts_salt_sig,
+                                                      row.names(smolt_vs_non_smolts_salt_sig) %in%
+                                                              lrt_sig_genes))
+smolt_vs_non_smolts_salt_lrt_wald <- gsub(pattern = "[.]1",
+                                          replacement = "",
+                                          smolt_vs_non_smolts_salt_lrt_wald)
+
+## Extract genes identified as significant by both LRT and Wald:
+smolt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(smolt_vs_non_smolts_fresh_sig,
+                                                       row.names(smolt_vs_non_smolts_fresh_sig) %in%
+                                                               lrt_sig_genes))
+smolt_vs_non_smolts_fresh_lrt_wald <- gsub(pattern = "[.]1",
+                                          replacement = "",
+                                          smolt_vs_non_smolts_fresh_lrt_wald)
+
+## Extract genes identified as significant by both LRT and Wald:
+non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(non_smolt_salt_vs_non_smolts_fresh_sig,
+                                                                row.names(non_smolt_salt_vs_non_smolts_fresh_sig) %in%
+                                                                        lrt_sig_genes))
+non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- gsub(pattern = "[.]1",
+                                                    replacement = "",
+                                                    non_smolt_salt_vs_non_smolts_fresh_lrt_wald)
 ```
 
 Generate PCA plots to explore expression profiles amongst individuals and treatments:
