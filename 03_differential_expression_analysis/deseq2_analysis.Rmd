@@ -166,14 +166,14 @@ dds_salt_s_salt_ns <- results(dds,
 # 2) Smolt saltwater vs Non-smolt freshwater
 dds_salt_s_fresh_ns <- results(dds,
                                contrast = c("group",
-                                      "salt_NonSmolt",
+                                      "fresh_NonSmolt",
                                       "salt_Smolt"))
 
 # 3) Non-smolt freshwater vs Non-smolt saltwater:
 dds_fresh_ns_salt_ns <- results(dds,
                                 contrast = c("group",
                                              "salt_NonSmolt",
-                                             "salt_Smolt"))
+                                             "fresh_NonSmolt"))
 ```
 
 We also want to perform Wald test between comparisons and take genes identified by both approaches as differentially expressed between groups as indentified by the LRT.
