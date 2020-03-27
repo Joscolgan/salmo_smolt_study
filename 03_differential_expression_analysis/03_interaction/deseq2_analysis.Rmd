@@ -130,52 +130,45 @@ rna_sample_info_liver$group <- paste(rna_sample_info_liver$environment,
 ### 'group'(a constructed column combining phenotype and enviornment).
 dds_txi <- DESeqDataSetFromTximport(txi,
                                    colData = rna_sample_info_liver,
-                                   design = ~sex + group)
+                                   design = ~sex + group + sex:group)
 
 ### using the results from above to run the DESeq analysis
 dds <- DESeq(dds_txi,
              test = "LRT",
-             reduced = ~sex)
+             reduced = ~sex + group)
 ```
+
+First interaction:
+
+```{r, message = FALSE}
+## Check names of comparisons:
+resultsNames(dds)
+
+## Define interaction:
+interaction <- "sexMale.groupsalt_NonSmolt"
+## Create results table to explore interaction term:
+diff_across_sexes <- results(dds,
+                             name = interaction)
+## Convert results table into dataframe:
+diff_across_sexes_df <- as.data.frame(diff_across_sexes)
+## Reorder by significance and count number of significantly
+## differentially expressed genes:
+diff_across_sexes_df_sorted <- diff_across_sexes_df[order(diff_across_sexes_df$padj), ]
+## Count the number of significant genes:
+diff_across_sexes_df_count <- nrow(subset(diff_across_sexes_df_sorted,
+                                                   padj < 0.05))
+## Print to console:
+print(c(paste("Total number of genes:",
+              diff_across_sexes_df_count)))
+diff_across_sexes_df_genes <- subset(diff_across_sexes_df_sorted,
+                                           padj < 0.05)
+```
+
 
 Compare numbers of differentially expressed genes between treatments of interest:
 1) Smolt saltwater vs Non-smolt saltwater
 2) Smolt saltwater vs Non-smolt freshwater
 3) Non-smolt freshwater vs Non-smolt saltwater
-
-```{r, message = FALSE}
-## JC: Here you are constrasting two specific groups contained within the DESeq object (dds).
-## The output of this function is a dataframe named 'dds_salt'.
-
-## Extract results for differentially expressed genes:
-# 1) Smolt saltwater vs Non-smolt saltwater
-dds_salt_s_salt_ns <- results(dds,
-                              contrast = c("group",
-                                      "salt_NonSmolt",
-                                      "salt_Smolt"))
-
-# 2) Smolt saltwater vs Non-smolt freshwater
-dds_salt_s_fresh_ns <- results(dds,
-                               contrast = c("group",
-                                      "fresh_NonSmolt",
-                                      "salt_Smolt"))
-
-# 3) Non-smolt freshwater vs Non-smolt saltwater:
-dds_fresh_ns_salt_ns <- results(dds,
-                                contrast = c("group",
-                                             "salt_NonSmolt",
-                                             "fresh_NonSmolt"))
-
-## LRT significant genes:
-lrt_raw_df <- as.data.frame(dds_salt_s_salt_ns)
-
-## Subset differentially expressed genes:
-lrt_raw_padj <- subset(lrt_raw_df,
-                       padj < 0.05)
-
-## Extract gene identifiers, which are stored as row names:
-lrt_sig_genes <- row.names(lrt_raw_padj)
-```
 
 We also want to perform Wald test between comparisons and take genes identified by both approaches as differentially expressed between groups as indentified by the LRT.
 
@@ -184,6 +177,28 @@ We also want to perform Wald test between comparisons and take genes identified 
 dds_wald <- DESeq(dds_txi,
              test = "Wald")
 ```
+
+First question: Is there difference in expression between sexes across treatments?
+
+```{r, message = FALSE}
+## Check comparison names:
+resultsNames(dds_wald)
+
+## Male vs female expression:
+dds_sex_male_vs_female <- results(dds_wald,
+                                  contrast = c("sex",
+                                               "Male",
+                                               "Female"))
+
+## Subset:
+dds_sex_male_vs_female_df <- as.data.frame(x = dds_sex_male_vs_female)
+
+## Expression between sexes:
+dds_sex_male_vs_female_sig <- subset(dds_sex_male_vs_female_df,
+                                     padj < 0.05)
+```
+
+Second question: Difference in expression between phenotypes?
 
 Extract group comparisons similar to above for the LRTs:
 Compare numbers of differentially expressed genes between treatments of interest:
@@ -226,13 +241,12 @@ smolt_vs_non_smolts_salt_df           <- as.data.frame(dds_salt_smolt_vs_salt_no
 smolt_vs_non_smolts_fresh_df          <- as.data.frame(dds_salt_smolt_vs_fresh_non_smolt)
 non_smolt_salt_vs_non_smolts_fresh_df <- as.data.frame(dds_salt_non_smolt_vs_fresh_non_smolt)
 ```
-
 Subset significant genes for each comparison:
 
 ```{r, message = FALSE}
-smolt_vs_non_smolts_salt_sig  <- subset(smolt_vs_non_smolts_salt_df,
+smolt_vs_non_smolts_salt_sig           <- subset(smolt_vs_non_smolts_salt_df,
                                         padj < 0.05)
-smolt_vs_non_smolts_fresh_sig <- subset(smolt_vs_non_smolts_fresh_df,
+smolt_vs_non_smolts_fresh_sig          <- subset(smolt_vs_non_smolts_fresh_df,
                                         padj < 0.05)
 non_smolt_salt_vs_non_smolts_fresh_sig <- subset(non_smolt_salt_vs_non_smolts_fresh_df,
                                                  padj < 0.05)
@@ -295,6 +309,30 @@ non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(non_smolt_salt_v
 non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- gsub(pattern = "[.]1",
                                                     replacement = "",
                                                     non_smolt_salt_vs_non_smolts_fresh_lrt_wald)
+```
+
+Third question: Investigate interaction between phenotype (group) and sex:
+
+```{r, message = FALSE}
+## Check comparison names:
+resultsNames(dds_wald)
+
+## compare smolts and non smolts
+## The effect of the interction between condition and sex: 
+dds_salt_non_smolt_vs_fresh_non_smolt_int <- results(dds_wald,
+                                            name = "sexMale.groupsalt_NonSmolt")
+
+
+dds_salt_smolt_vs_fresh_non_smolt_int    <- results(dds_wald,
+                                            name = "sexMale.groupsalt_Smolt")
+
+dds_salt_smolt_vs_fresh_non_smolt_int_df <- as.data.frame(dds_salt_smolt_vs_fresh_non_smolt_int)
+dds_salt_smolt_vs_fresh_non_smolt_int_sig <- subset(dds_salt_smolt_vs_fresh_non_smolt_int_df,
+                                                    padj < 0.05)
+
+nrow(subset(dds_sex_male_vs_female_sig,
+       row.names(dds_sex_male_vs_female_sig) %in%
+               row.names(dds_salt_smolt_vs_fresh_non_smolt_int_sig)))
 ```
 
 Generate PCA plots to explore expression profiles amongst individuals and treatments:
