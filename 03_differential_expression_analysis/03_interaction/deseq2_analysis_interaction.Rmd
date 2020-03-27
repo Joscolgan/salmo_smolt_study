@@ -249,19 +249,11 @@ colnames(smolt_vs_non_smolts_fresh_gene_pvalue) <- c("locus",
                                                     "raw_pvalue",
                                                     "padj")
 
-## Comparison 3: Salt smolt and fresh non-smolt:
+## Comparison 3: Salt smolt and salt non-smolt:
 smolt_vs_non_smolts_salt_gene_pvalue <- as.data.frame(cbind(row.names(smolt_vs_non_smolts_salt_df),
                                                             smolt_vs_non_smolts_salt_df[, 5:6]))
 ## Update column name:
 colnames(smolt_vs_non_smolts_salt_gene_pvalue) <- c("locus",
-                                                    "raw_pvalue",
-                                                    "padj")
-                                                    
-## Comparison 2) Salt smolt and fresh non-smolt:
-smolt_vs_non_smolts_fresh_gene_pvalue <- as.data.frame(cbind(row.names(dds_salt_smolt_vs_fresh_non_smolt_int_df),
-                                                            smolt_vs_non_smolts_fresh_df[, 5:6]))
-## Update column name:
-colnames(smolt_vs_non_smolts_fresh_gene_pvalue) <- c("locus",
                                                     "raw_pvalue",
                                                     "padj")
 ```
