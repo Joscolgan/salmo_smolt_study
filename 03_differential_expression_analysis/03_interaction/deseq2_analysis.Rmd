@@ -144,26 +144,19 @@ First interaction:
 ## Check names of comparisons:
 resultsNames(dds)
 
-## Define interaction:
-interaction <- "sexMale.groupsalt_NonSmolt"
-## Create results table to explore interaction term:
+## Difference between the sexes: 
 diff_across_sexes <- results(dds,
-                             name = interaction)
-## Convert results table into dataframe:
-diff_across_sexes_df <- as.data.frame(diff_across_sexes)
-## Reorder by significance and count number of significantly
-## differentially expressed genes:
-diff_across_sexes_df_sorted <- diff_across_sexes_df[order(diff_across_sexes_df$padj), ]
-## Count the number of significant genes:
-diff_across_sexes_df_count <- nrow(subset(diff_across_sexes_df_sorted,
-                                                   padj < 0.05))
-## Print to console:
-print(c(paste("Total number of genes:",
-              diff_across_sexes_df_count)))
-diff_across_sexes_df_genes <- subset(diff_across_sexes_df_sorted,
-                                           padj < 0.05)
-```
+                             contrast = c("sex",
+                                          "Male",
+                                          "Female"))
 
+## Difference between the sexes:
+diff_across_sexes_df <- as.data.frame(x = diff_across_sexes)
+
+## Subset significant terms:
+diff_across_sexes_sig <- subset(diff_across_sexes_df,
+                                padj < 0.05)
+```
 
 Compare numbers of differentially expressed genes between treatments of interest:
 1) Smolt saltwater vs Non-smolt saltwater
