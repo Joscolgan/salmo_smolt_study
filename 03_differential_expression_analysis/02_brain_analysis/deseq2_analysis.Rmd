@@ -70,7 +70,7 @@ rna_sample_info <- read.table(file = "./RNASEQ/RNAseq_Sample_File_Reduced.txt", 
 ## JC - See comment above:
 head(rna_sample_info)
 
-## RNASeq analysis for liver samples:
+## RNASeq analysis for brain samples:
 # give R the file path needed, we do this by taking any file from the dirctory with
 #'quant.sf attached to the end of the name
 ## JC - Create a vector containing a list of paths for each sample
@@ -82,35 +82,35 @@ files <- file.path("./RNASEQ",
                    "quant.sf")
 
 # At present, all samples are being loaded in as input, which contains a mix of liver and brain samples.
-#create a dataframe which labels all of the Liver files as true
+#create a dataframe which labels all of the brain files as true
 #this will help is separate the organs as we will be looking at the
-#brain and liver separetly
+#brain and liver separately
 files_df <- as.data.frame(cbind(files,
-                                grepl(pattern = "_L",
+                                grepl(pattern = "_B",
                                       x = files)))
 
-## creating a subset of just liver samples
+## creating a subset of just brain samples
 ## JC: This step subsets the dataframe 'files_df' by checking if values in column 'V2'
 ## are annotated as 'TRUE'. If so, it subsets these entire lines into a new dataframe
-## called 'files_liver_df'.
-files_liver_df <- subset(files_df,
+## called 'files_brain_df'.
+files_brain_df <- subset(files_df,
                          V2 == TRUE)
 
-## creating a subset with all of the discriptive information for all of the liver samples
+## creating a subset with all of the discriptive information for all of the brain samples
 ##from the 'RNAseqsamples' document
 ## JC - Again, 'subset' is the function, it takes dataframes as input and creates dataframes
 ## as output. For this command, the dataframe 'RNAsamples' is subset by the column which contains
-## 'tissue' information and only rows related to samples annotated as 'Liver' are subsetted into
-## a new dataframe 'RNAsamples_liver'.
-rna_sample_info_liver <- subset(rna_sample_info,
-                                tissue == "Liver")
+## 'tissue' information and only rows related to samples annotated as 'Brain' are subsetted into
+## a new dataframe 'rna_sample_info_brain'.
+rna_sample_info_brain <- subset(rna_sample_info,
+                                tissue == "Brain")
 
 ## specify the path to the files using the appropriate columns of samples
 ## also need to link transcripts to genes for this dataset:
 tx2gene <- read.table("./RNASEQ/combined_transcript_to_gene.txt")
 
 ## Ensure that names are of class character:
-files <- as.character(files_liver_df$files)
+files <- as.character(files_brain_df$files)
 
 ## Generate gene level counts:
 txi <- tximport(files,
@@ -121,15 +121,15 @@ txi <- tximport(files,
 class(txi)
 
 ### group factors for different comparasons
-rna_sample_info_liver$group <- paste(rna_sample_info_liver$environment,
+rna_sample_info_brain$group <- paste(rna_sample_info_brain$environment,
                                      "_",
-                                     rna_sample_info_liver$phenotype,
+                                     rna_sample_info_brain$phenotype,
                                      sep = "")
 
 ### input values and create intermediate calculations and results of an analysis of differential expression looking at sex and
 ### 'group'(a constructed column combining phenotype and enviornment).
 dds_txi <- DESeqDataSetFromTximport(txi,
-                                   colData = rna_sample_info_liver,
+                                   colData = rna_sample_info_brain,
                                    design = ~sex + group)
 
 ### using the results from above to run the DESeq analysis
@@ -307,8 +307,8 @@ vsd <- vst(dds,
 ## Generate plot:
 plotPCA(vsd,
         intgroup=c("group")) +
-        ggtitle("Varience between the liver transcriptome profiles of called phenotypes in different Environments") +
-        geom_text(label = rna_sample_info_liver$sample,
+        ggtitle("Variance between the brain transcriptome profiles of alternative phenotypes in different environments") +
+        geom_text(label = rna_sample_info_brain$sample,
             nudge_x = 3)
 
 
@@ -323,5 +323,5 @@ plotPCA(vsd, intgroup=c("maturity"))
 Save everything:
 
 ```{r, message = FALSE}
-save.image(file = "./DESeq2_output_liver.RData")
+save.image(file = "./DESeq2_output_brain.RData")
 ```
