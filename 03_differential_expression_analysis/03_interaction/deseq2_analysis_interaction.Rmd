@@ -48,14 +48,14 @@ getwd()
 load(file = "../data/DESeq2_output_liver.RData")
 ```
 
-Create model for investigating interaction term:
+Create model for investigating interaction effect between group and sex:
 
 ```{r, message = FALSE}
 ### input values and create intermediate calculations and results of an analysis of differential expression looking at sex and
 ### 'group'(a constructed column combining phenotype and enviornment).
 dds_txi <- DESeqDataSetFromTximport(txi,
-                                   colData = rna_sample_info_liver,
-                                   design = ~sex + group + sex:group)
+                                    colData = rna_sample_info_liver,
+                                    design = ~sex + group + sex:group)
 
 ### using the results from above to run the DESeq analysis
 dds <- DESeq(dds_txi,
@@ -63,8 +63,7 @@ dds <- DESeq(dds_txi,
              reduced = ~sex + group)
 ```
 
-Question One:  
-Is there an interaction effect of group (environment + phenotype) across males in comparison to females that explains gene expression?
+Investigate interaction across groups + sex:
 
 ```{r, message = FALSE}
 ## Check names of comparisons:
@@ -72,7 +71,7 @@ resultsNames(dds)
 
 ## Extract significant results:
 lrt_df <- results(dds,
-                  name = "sexMale.groupfresh_NonSmolt")
+                  name = "sexMale.groupsalt_NonSmolt")
 
 ## Extract significant genes:
 lrt_sig <- subset(x = lrt_df,
@@ -80,32 +79,9 @@ lrt_sig <- subset(x = lrt_df,
 
 ## Get gene list:
 lrt_sig_genes <- row.names(lrt_sig)
+length(lrt_sig_genes)
 ```
-
-Question Two:  
-Do sexes differ in expression across the three groups?
-
-```{r, message = FALSE}
-## Difference between the sexes:
-diff_across_sexes <- results(dds,
-                             contrast = c("sex",
-                                          "Male",
-                                          "Female"))
-
-## Difference between the sexes:
-diff_across_sexes_df <- as.data.frame(x = diff_across_sexes)
-
-## Subset significant terms:
-diff_across_sexes_sig <- subset(diff_across_sexes_df,
-                                padj < 0.05)
-```
-
-Compare numbers of differentially expressed genes between treatments of interest:
-1) Smolt saltwater vs Non-smolt saltwater
-2) Smolt saltwater vs Non-smolt freshwater
-3) Non-smolt freshwater vs Non-smolt saltwater
-
-We also want to perform Wald test between comparisons and take genes identified by both approaches as differentially expressed between groups as indentified by the LRT.
+We also want to perform Wald test between comparisons and take significant genes identified by both approaches.
 
 ```{r, message = FALSE}
 ### Run a Wald test:
@@ -113,93 +89,70 @@ dds_wald <- DESeq(dds_txi,
              test = "Wald")
 ```
 
-First question: Is there difference in expression between sexes across treatments?
+Question: Difference in expression between groups (environment + phenotype)?
 
-```{r, message = FALSE}
-## Check comparison names:
-resultsNames(dds_wald)
-
-## Male vs female expression:
-dds_sex_male_vs_female <- results(dds_wald,
-                                  contrast = c("sex",
-                                               "Male",
-                                               "Female"))
-
-## Subset:
-dds_sex_male_vs_female_df <- as.data.frame(x = dds_sex_male_vs_female)
-
-## Expression between sexes:
-dds_sex_male_vs_female_sig <- subset(dds_sex_male_vs_female_df,
-                                     padj < 0.05)
-```
-
-Second question: Difference in expression between phenotypes?
-
-Extract group comparisons similar to above for the LRTs:
-Compare numbers of differentially expressed genes between treatments of interest:
-1) Smolt saltwater vs Non-smolt saltwater
-2) Smolt saltwater vs Non-smolt freshwater
-3) Non-smolt freshwater vs Non-smolt saltwater
-
+Compare numbers of differentially expressed genes between groups to understand the interaction effect of sex on:
+1) Smolt saltwater in comparison to Non-smolt freshwater
+2) Non-smolt saltwater in comparison to Non-smolt freshwater
+3) Smolt saltwater in comparison to Non-smolt saltwater
 
 ```{r, message = FALSE}
 ## Check comparison names:
 resultsNames(dds_wald)
 
 ## compare smolts and non smolts
-## The effect of the interction between group and sex:
-## Comparison 1) Salt non-smolt and fresh non-smolt:
-dds_salt_non_smolt_vs_fresh_non_smolt_int <- results(dds_wald,
-                                            name = "sexMale.groupsalt_NonSmolt")
-## Convert Results output to dataframe:
-dds_salt_non_smolt_vs_fresh_non_smolt_int_df <- as.data.frame(dds_salt_non_smolt_vs_fresh_non_smolt_int)
-## Subset significant genes:
-dds_salt_non_smolt_vs_fresh_non_smolt_int_sig <- subset(dds_salt_non_smolt_vs_fresh_non_smolt_int_df,
-                                                    padj < 0.05)
-
-## Comparison 2) Salt smolt and fresh non-smolt:
+## The effect of the interction between condition and sex:
+## 1) Smolt saltwater in comparison to Non-smolt freshwater:
 dds_salt_smolt_vs_fresh_non_smolt_int    <- results(dds_wald,
-                                            name = "sexMale.groupsalt_Smolt")
-## Convert Results output to dataframe:
+                                                    name = "sexMale.groupsalt_Smolt")
+
+## Convert to dataframe:
 dds_salt_smolt_vs_fresh_non_smolt_int_df <- as.data.frame(dds_salt_smolt_vs_fresh_non_smolt_int)
 ## Subset significant genes:
 dds_salt_smolt_vs_fresh_non_smolt_int_sig <- subset(dds_salt_smolt_vs_fresh_non_smolt_int_df,
                                                     padj < 0.05)
+nrow(dds_salt_smolt_vs_fresh_non_smolt_int_sig)
+
+## 2) Non-smolt saltwater in comparison to Non-smolt freshwater:
+dds_salt_non_smolt_vs_fresh_non_smolt_int <- results(dds_wald,
+                                                     name = "sexMale.groupsalt_NonSmolt")
+## Convert to dataframe:
+dds_salt_non_smolt_vs_fresh_non_smolt_int_df <- as.data.frame(dds_salt_non_smolt_vs_fresh_non_smolt_int)
+## Subset significant genes:
+dds_salt_non_smolt_vs_fresh_non_smolt_int_sig <- subset(dds_salt_non_smolt_vs_fresh_non_smolt_int_df,
+                                                        padj < 0.05)
+nrow(dds_salt_non_smolt_vs_fresh_non_smolt_int_sig)
 ```
 
-Reorder reference for Wald test to allow for comparing 
+Reorder reference for Wald test for comparison of:
+3) Non-smolt freshwater vs Non-smolt saltwater
+At present, the reference level is set to 'fresh_NonSmolt' so can only explore the interaction effect of sex on:
 
 ```{r, message = FALSE}
 ## Relevel the reference group for comparison:
 rna_sample_info_liver$group <- relevel(as.factor(rna_sample_info_liver$group),
-                                       ref = "salt_Smolt")
+                                       ref = "salt_NonSmolt")
 
 ### Run a Wald test:
 dds_wald <- DESeq(dds_txi,
              test = "Wald")
 
-## Comparison 3) Salt smolt and salt non-smolt:
+## 3) Smolt saltwater in comparison to Non-smolt saltwater:
 dds_salt_smolt_vs_salt_non_smolt_int <- results(dds_wald,
-                                                name = "sexMale.groupsalt_NonSmolt")
+                                                 name = "sexMale.groupsalt_Smolt")
+
+## Convert to dataframe:
 dds_salt_smolt_vs_salt_non_smolt_int_df <- as.data.frame(dds_salt_smolt_vs_salt_non_smolt_int)
+## Extract significant genes:
 dds_salt_smolt_vs_salt_non_smolt_int_sig <- subset(dds_salt_smolt_vs_salt_non_smolt_int_df,
-                                                   padj < 0.05)
+                                                    padj < 0.05)
 ```
 
 Check overlap between LRT and Wald:
 
 ```{r, message = FALSE}
 ## Extract genes identified as significant by both LRT and Wald:
-## Comparison 1) Salt non-smolt and fresh non-smolt:
-non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(dds_salt_smolt_vs_fresh_non_smolt_int_sig,
-                                                                row.names(dds_salt_smolt_vs_fresh_non_smolt_int_sig) %in%
-                                                                        lrt_sig_genes))
-non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- gsub(pattern = "[.]1",
-                                                    replacement = "",
-                                                    non_smolt_salt_vs_non_smolts_fresh_lrt_wald)
-length(non_smolt_salt_vs_non_smolts_fresh_lrt_wald)
-
-## Comparison 2) Salt smolt and fresh non-smolt:
+## 1) Smolt saltwater in comparison to Non-smolt freshwater:
 ## Extract genes identified as significant by both LRT and Wald:
 smolt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(dds_salt_smolt_vs_fresh_non_smolt_int_sig,
                                                        row.names(dds_salt_smolt_vs_fresh_non_smolt_int_sig) %in%
@@ -209,7 +162,17 @@ smolt_vs_non_smolts_fresh_lrt_wald <- gsub(pattern = "[.]1",
                                           smolt_vs_non_smolts_fresh_lrt_wald)
 length(smolt_vs_non_smolts_fresh_lrt_wald)
 
-## Comparison 3) Salt smolt and salt non-smolt:
+## 2) Non-smolt saltwater in comparison to Non-smolt freshwater:
+## Extract genes identified as significant by both LRT and Wald:
+non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(dds_salt_smolt_vs_fresh_non_smolt_int_sig,
+                                                                row.names(dds_salt_smolt_vs_fresh_non_smolt_int_sig) %in%
+                                                                        lrt_sig_genes))
+non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- gsub(pattern = "[.]1",
+                                                    replacement = "",
+                                                    non_smolt_salt_vs_non_smolts_fresh_lrt_wald)
+length(non_smolt_salt_vs_non_smolts_fresh_lrt_wald)
+
+## 3) Smolt saltwater in comparison to Non-smolt saltwater:
 smolt_vs_non_smolts_salt_lrt_wald <- row.names(subset(dds_salt_smolt_vs_salt_non_smolt_int_sig,
                                                       row.names(dds_salt_smolt_vs_salt_non_smolt_int_sig) %in%
                                                               lrt_sig_genes))
@@ -225,34 +188,26 @@ Subset gene name and p value for all genes analysed:
 ## For each comparison, extract:
 ## 1) gene name (taken from the row names of each dataframe) # Required for Euler plots
 ## 2) unadjusted p value # Required for GO term enrichment
-## Comparison 1) Salt non-smolt and fresh non-smolt:
-non_smolt_salt_vs_non_smolts_fresh_gene_pvalue <- as.data.frame(cbind(row.names(non_smolt_salt_vs_non_smolts_fresh_df),
-                                                            non_smolt_salt_vs_non_smolts_fresh_df[, 5:6]))
-## Update column name:
-colnames(non_smolt_salt_vs_non_smolts_fresh_gene_pvalue) <- c("locus",
-                                                              "raw_pvalue",
-                                                              "padj")
-
-
-smolt_vs_non_smolts_salt_gene_pvalue <- as.data.frame(cbind(row.names(smolt_vs_non_smolts_salt_df),
-                                                            smolt_vs_non_smolts_salt_df[, 5:6]))
-## Update column name:
-colnames(smolt_vs_non_smolts_salt_gene_pvalue) <- c("locus",
-                                                    "raw_pvalue",
-                                                    "padj")
-
-## Comparison 2) Salt smolt and fresh non-smolt:
+## 1) Smolt saltwater in comparison to Non-smolt freshwater:
 smolt_vs_non_smolts_fresh_gene_pvalue <- as.data.frame(cbind(row.names(dds_salt_smolt_vs_fresh_non_smolt_int_df),
                                                             smolt_vs_non_smolts_fresh_df[, 5:6]))
-## Update column name:
+## Update column names:
 colnames(smolt_vs_non_smolts_fresh_gene_pvalue) <- c("locus",
                                                     "raw_pvalue",
                                                     "padj")
 
-## Comparison 3: Salt smolt and salt non-smolt:
+## 2) Non-smolt saltwater in comparison to Non-smolt freshwater:
+non_smolt_salt_vs_non_smolts_fresh_gene_pvalue <- as.data.frame(cbind(row.names(non_smolt_salt_vs_non_smolts_fresh_df),
+                                                            non_smolt_salt_vs_non_smolts_fresh_df[, 5:6]))
+## Update column names:
+colnames(non_smolt_salt_vs_non_smolts_fresh_gene_pvalue) <- c("locus",
+                                                              "raw_pvalue",
+                                                              "padj")
+
+## 3) Smolt saltwater in comparison to Non-smolt saltwater:
 smolt_vs_non_smolts_salt_gene_pvalue <- as.data.frame(cbind(row.names(smolt_vs_non_smolts_salt_df),
                                                             smolt_vs_non_smolts_salt_df[, 5:6]))
-## Update column name:
+## Update column names:
 colnames(smolt_vs_non_smolts_salt_gene_pvalue) <- c("locus",
                                                     "raw_pvalue",
                                                     "padj")
@@ -265,6 +220,7 @@ save.image(file = "./DESeq2_output_interaction_liver.RData")
 ```
 
 Run lintr:
+
 ```{r, message = FALSE}
 require(lintr)
 lintr::lint(file = "./deseq2_analysis_interaction.Rmd")
