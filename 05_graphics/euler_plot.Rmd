@@ -21,7 +21,7 @@ library(ggplot2)
 Next, load input data:
 
 ```{r, message = FALSE}
-load(file = "DESeq2_output_liver.RData")
+load(file = "../data/DESeq2_output_liver.RData")
 ```
 
 Create a list of comparisons to plot:
@@ -46,57 +46,3 @@ ggsave(filename = "./euler_plots/comparison_degs.png",
        height = 5)
 ```
 
-
-############## Potential code to "burn" - remove!
-length(dds_smolt_vs_non_Smolt_salt_gene_list)
-length(dds_Non_smolt_salt_vs_non_Fresh_salt_as_df_gene_list)
-length(dds_smolt_vs_non_Smolt_fresh_as_df_gene_list)
-
-dds_smolt_vs_non_Smolt_fresh_as_df_gene_list
-                                        
-                                        
-class(vendiagram)
-
-head(vendiagram$original.values)
-
-table(c(dds_smolt_vs_non_Smolt_salt_gene_list,
-  dds_Non_smolt_salt_vs_non_Fresh_salt_as_df_gene_list))
-
-
-vendiagram$original.values
-
-########################################################
-
-
-
-### Test run post go enrichment
-
-## gen
-##
-##  Biological processes (100k)
-df_non_smolt_salt_vs_non_smolt_fresh_significant_genes_BP <- as.data.frame(non_smolt_salt_vs_non_smolt_fresh_significant_genes_BP)
-df_smolt_salt_vs_non_smolt_salt_significant_genes_pvalue_BP <-as.data.frame(smolt_salt_vs_non_smolt_salt_significant_genes_pvalue_BP)
-df_smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP <-as.data.frame(smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP)
-
-head(non_smolt_salt_vs_non_smolt_fresh_significant_genes_BP)
-head(smolt_salt_vs_non_smolt_salt_significant_genes_pvalue_BP)
-head(smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP)
-
-df_smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP
-
-vendiagram2 <- euler(combinations = list("Smolt vs Non Smolt saltwater"= smolt_salt_vs_non_smolt_salt_significant_genes_pvalue_BP,
-                                        "Non Smolt saltwater vs Non Smolt freshwater" =non_smolt_salt_vs_non_smolt_fresh_significant_genes_BP,
-                                        "Smolt vs Non Smolt freshwater" = smolt_salt_vs_non_smolt_fresh_significant_genes_pvalue_BP))
-
-
-plot(vendiagram2, quantities = TRUE, edges = TRUE)
-
-class(vendiagram)
-
-head(vendiagram$original.values)
-
-table(c(dds_smolt_vs_non_Smolt_salt_gene_list,
-        dds_Non_smolt_salt_vs_non_Fresh_salt_as_df_gene_list))
-
-
-vendiagram$original.values
