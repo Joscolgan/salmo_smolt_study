@@ -1,0 +1,92 @@
+
+## Here include some basic information
+## Name of author:Robert Wynne
+## Date:24/01/2020
+## Program name: .Rmd
+## Purpose of the script: plot euler
+## This script does XX, YYY and ZZZ.
+##
+## Mention what it takes as input
+##
+## It outputs... - We can work on this when I get back.
+
+First step, load library required for plotting:
+
+```{r, message = FALSE}
+##install.packages("eulerr")
+library(eulerr)
+library(ggplot2)
+```
+
+Next, load input data:
+
+```{r, message = FALSE}
+load(file = "DESeq2_output_liver.RData")
+```
+
+Create a list of comparisons to plot:
+
+```{r, message = FALSE}
+vendiagram <- euler(combinations = list("Smolt-SW vs Resident-SW" = smolt_vs_non_smolts_salt_lrt_wald,
+                                        "Smolt-SW vs Resident-FW" = smolt_vs_non_smolts_fresh_lrt_wald,
+                                        "Resident-SW vs Resident-FW" = non_smolt_salt_vs_non_smolts_fresh_lrt_wald))
+```
+
+Plot Venn diagram
+
+Select all code and run together at the same time to save plot.
+It won't work it execute lines of code indepedently.
+
+```{r, message = FALSE}
+pdf(file = "results/euler_plot.pdf",
+     width = 6,
+     height = 4)
+plot(vendiagram,
+     quantities = TRUE,
+     edges = TRUE)
+dev.off()
+```
+
+Extract genes identified in all three comparisons:
+
+```{r, message = FALSE}
+combined_gene_list <- c(smolt_vs_non_smolts_salt_lrt_wald,
+                        smolt_vs_non_smolts_fresh_lrt_wald,
+                        non_smolt_salt_vs_non_smolts_fresh_lrt_wald)
+
+## Count incidences of each gene:
+combined_gene_table <- as.data.frame(cbind(table(combined_gene_list)))
+
+## Subset DEGs occurring in all three comparisons:
+three_group_degs <- subset(combined_gene_table,
+                           V1 == 3)
+nrow(three_group_degs)
+## Create gene-list:
+three_group_gene_list <- row.names(three_group_degs)
+```
+
+Extract genes identified as unique for Smolt-SW vs Resident-SW:
+
+```{r, message = FALSE}
+## Extract DEGs unique to smolt_sw vs resident_sw:
+smolt_sw_vs_res_sw_degs <- subset(combined_gene_table,
+                                  V1 == 1 &
+                                          row.names(combined_gene_table) %in%
+                                          smolt_vs_non_smolts_salt_lrt_wald)
+## Create gene_list:
+smolt_sw_vs_res_sw_gene_list <- row.names(smolt_sw_vs_res_sw_degs)
+
+## Extract DEGs unique to smolt_sw vs resident_fw:
+smolt_sw_vs_res_fw_degs <- subset(combined_gene_table,
+                                  V1 == 1 &
+                                          row.names(combined_gene_table) %in%
+                                          smolt_vs_non_smolts_fresh_lrt_wald)
+## Create gene_list:
+smolt_sw_vs_res_fw_gene_list <- row.names(smolt_sw_vs_res_fw_degs)
+```
+
+For now, save everything:
+
+```{r, message = FALSE}
+save.image(file = "eulerr_output_liver.RData")
+```
