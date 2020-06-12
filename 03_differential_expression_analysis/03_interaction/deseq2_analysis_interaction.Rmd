@@ -45,7 +45,7 @@ setwd("~/")
 getwd()
 
 ## Load R object:
-load(file = "../data/DESeq2_output_liver.RData")
+load(file = "results/DESeq2_output_liver.RData")
 ```
 
 Create model for investigating interaction effect between group and sex:
@@ -133,6 +133,10 @@ At present, the reference level is set to 'fresh_NonSmolt' so can only explore t
 rna_sample_info_liver$group <- relevel(as.factor(rna_sample_info_liver$group),
                                        ref = "salt_NonSmolt")
 
+dds_txi <- DESeqDataSetFromTximport(txi,
+                                    colData = rna_sample_info_liver,
+                                    design = ~sex + group + sex:group)
+
 ### Run a Wald test:
 dds_wald <- DESeq(dds_txi,
              test = "Wald")
@@ -146,6 +150,7 @@ dds_salt_smolt_vs_salt_non_smolt_int_df <- as.data.frame(dds_salt_smolt_vs_salt_
 ## Extract significant genes:
 dds_salt_smolt_vs_salt_non_smolt_int_sig <- subset(dds_salt_smolt_vs_salt_non_smolt_int_df,
                                                     padj < 0.05)
+length(dds_salt_smolt_vs_salt_non_smolt_int_sig)
 ```
 
 Check overlap between LRT and Wald:
@@ -164,8 +169,8 @@ length(smolt_vs_non_smolts_fresh_lrt_wald)
 
 ## 2) Non-smolt saltwater in comparison to Non-smolt freshwater:
 ## Extract genes identified as significant by both LRT and Wald:
-non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(dds_salt_smolt_vs_fresh_non_smolt_int_sig,
-                                                                row.names(dds_salt_smolt_vs_fresh_non_smolt_int_sig) %in%
+non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(dds_salt_non_smolt_vs_fresh_non_smolt_int_sig,
+                                                                row.names(dds_salt_non_smolt_vs_fresh_non_smolt_int_sig) %in%
                                                                         lrt_sig_genes))
 non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- gsub(pattern = "[.]1",
                                                     replacement = "",
@@ -216,12 +221,5 @@ colnames(smolt_vs_non_smolts_salt_gene_pvalue) <- c("locus",
 Save everything:
 
 ```{r, message = FALSE}
-save.image(file = "./DESeq2_output_interaction_liver.RData")
-```
-
-Run lintr:
-
-```{r, message = FALSE}
-require(lintr)
-lintr::lint(file = "./deseq2_analysis_interaction.Rmd")
+save.image(file = "DESeq2_output_interaction_liver.RData")
 ```
