@@ -218,6 +218,40 @@ colnames(smolt_vs_non_smolts_salt_gene_pvalue) <- c("locus",
                                                     "padj")
 ```
 
+Check overlap among comparisons:
+
+```{r, message = FALSE}
+## check number of overlapping genes across all comparisons:
+## A) Are there genes where a significant interaction effect between sex and group is identified for:
+## smolt in comparison to resident freshwater and;
+## resident saltwater in comparison to resident freshwater and;
+## smolt in comparison to resident saltwater?
+table(table(c(smolt_vs_non_smolts_fresh_lrt_wald,
+        non_smolt_salt_vs_non_smolts_fresh_lrt_wald,
+        smolt_vs_non_smolts_salt_lrt_wald)))
+
+## check number of overlapping genes across each comparison:
+## B) Are there genes where a significant interaction effect between sex and group is identified for:
+## smolt in comparison to resident freshwater and;
+## resident saltwater in comparison to resident freshwater?
+table(table(c(smolt_vs_non_smolts_fresh_lrt_wald,
+        non_smolt_salt_vs_non_smolts_fresh_lrt_wald)))
+
+## check number of overlapping genes across each comparison:
+## C) Are there genes where a significant interaction effect between sex and group is identified for:
+## smolt in comparison to resident freshwater and;
+## smolt in comparison to resident saltwater?
+table(table(c(smolt_vs_non_smolts_fresh_lrt_wald,
+        smolt_vs_non_smolts_salt_lrt_wald)))
+
+## check number of overlapping genes across each comparison:
+## D) Are there genes where a significant interaction effect between sex and group is identified for:
+## resident salwater in comparison to resident freshwater;
+## smolt in comparison to resident saltwater?
+table(table(c(non_smolt_salt_vs_non_smolts_fresh_lrt_wald,
+        smolt_vs_non_smolts_salt_lrt_wald)))
+```
+
 Save everything:
 
 ```{r, message = FALSE}
