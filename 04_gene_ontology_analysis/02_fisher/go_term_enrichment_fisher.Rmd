@@ -57,7 +57,7 @@ gene_list <- three_group_gene_list
 ## Define node size:
 node_size <- 50
 ## Assign name to database:
-database <- "strutta_drerio_immmune"
+database <- "strutta_drerio"
 ## Name output directory:
 output_directory <- paste("results/",
                           database,
