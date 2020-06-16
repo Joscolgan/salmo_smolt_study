@@ -145,22 +145,12 @@ dds_wald <- DESeq(dds_txi,
 dds_salt_smolt_vs_salt_non_smolt_int <- results(dds_wald,
                                                  name = "sexMale.groupsalt_Smolt")
 
-dds_fresh_non_smolt_vs_salt_non_smolt_int <- results(dds_wald,
-                                                 name = "sexMale.groupfresh_NonSmolt")
-
 ## Convert to dataframe:
 dds_salt_smolt_vs_salt_non_smolt_int_df <- as.data.frame(dds_salt_smolt_vs_salt_non_smolt_int)
 ## Extract significant genes:
 dds_salt_smolt_vs_salt_non_smolt_int_sig <- subset(dds_salt_smolt_vs_salt_non_smolt_int_df,
                                                     padj < 0.05)
 length(dds_salt_smolt_vs_salt_non_smolt_int_sig)
-
-## Convert to dataframe:
-dds_fresh_non_smolt_vs_salt_non_smolt_int_df <- as.data.frame(dds_fresh_non_smolt_vs_salt_non_smolt_int)
-## Extract significant genes:
-dds_fresh_non_smolt_vs_salt_non_smolt_int_sig <- subset(dds_fresh_non_smolt_vs_salt_non_smolt_int_df,
-                                                    padj < 0.05)
-length(dds_fresh_non_smolt_vs_salt_non_smolt_int_sig)
 ```
 
 Check overlap between LRT and Wald:
@@ -179,8 +169,8 @@ length(smolt_vs_non_smolts_fresh_lrt_wald)
 
 ## 2) Non-smolt saltwater in comparison to Non-smolt freshwater:
 ## Extract genes identified as significant by both LRT and Wald:
-non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(dds_salt_smolt_vs_fresh_non_smolt_int_sig,
-                                                                row.names(dds_salt_smolt_vs_fresh_non_smolt_int_sig) %in%
+non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- row.names(subset(dds_salt_non_smolt_vs_fresh_non_smolt_int_sig,
+                                                                row.names(dds_salt_non_smolt_vs_fresh_non_smolt_int_sig) %in%
                                                                         lrt_sig_genes))
 non_smolt_salt_vs_non_smolts_fresh_lrt_wald <- gsub(pattern = "[.]1",
                                                     replacement = "",
@@ -228,15 +218,42 @@ colnames(smolt_vs_non_smolts_salt_gene_pvalue) <- c("locus",
                                                     "padj")
 ```
 
+Check overlap among comparisons:
+
+```{r, message = FALSE}
+## check number of overlapping genes across all comparisons:
+## A) Are there genes where a significant interaction effect between sex and group is identified for:
+## smolt in comparison to resident freshwater and;
+## resident saltwater in comparison to resident freshwater and;
+## smolt in comparison to resident saltwater?
+table(table(c(smolt_vs_non_smolts_fresh_lrt_wald,
+        non_smolt_salt_vs_non_smolts_fresh_lrt_wald,
+        smolt_vs_non_smolts_salt_lrt_wald)))
+
+## check number of overlapping genes across each comparison:
+## B) Are there genes where a significant interaction effect between sex and group is identified for:
+## smolt in comparison to resident freshwater and;
+## resident saltwater in comparison to resident freshwater?
+table(table(c(smolt_vs_non_smolts_fresh_lrt_wald,
+        non_smolt_salt_vs_non_smolts_fresh_lrt_wald)))
+
+## check number of overlapping genes across each comparison:
+## C) Are there genes where a significant interaction effect between sex and group is identified for:
+## smolt in comparison to resident freshwater and;
+## smolt in comparison to resident saltwater?
+table(table(c(smolt_vs_non_smolts_fresh_lrt_wald,
+        smolt_vs_non_smolts_salt_lrt_wald)))
+
+## check number of overlapping genes across each comparison:
+## D) Are there genes where a significant interaction effect between sex and group is identified for:
+## resident salwater in comparison to resident freshwater;
+## smolt in comparison to resident saltwater?
+table(table(c(non_smolt_salt_vs_non_smolts_fresh_lrt_wald,
+        smolt_vs_non_smolts_salt_lrt_wald)))
+```
+
 Save everything:
 
 ```{r, message = FALSE}
-save.image(file = "./DESeq2_output_interaction_liver.RData")
-```
-
-Run lintr:
-
-```{r, message = FALSE}
-require(lintr)
-lintr::lint(file = "./deseq2_analysis_interaction.Rmd")
+save.image(file = "DESeq2_output_interaction_liver.RData")
 ```
