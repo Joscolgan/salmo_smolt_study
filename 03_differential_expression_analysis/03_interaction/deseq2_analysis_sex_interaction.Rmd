@@ -70,6 +70,14 @@ Investigate interaction across groups + sex:
 resultsNames(dds)
 
 ## Extract significant results:
+sex_effect <- results(dds,
+                  name = "sex_Male_vs_Female")
+
+## Extract significant genes:
+sex_effect_sig <- subset(x = sex_effect,
+                         padj < 0.05)
+
+## Extract significant results:
 lrt_df <- results(dds,
                   name = "sexMale.groupsalt_NonSmolt")
 
@@ -100,11 +108,20 @@ Compare numbers of differentially expressed genes between groups to understand t
 ## Check comparison names:
 resultsNames(dds_wald)
 
+## Extract significant results:
+sex_effect_wald <- results(dds_wald,
+                           name = "sex_Male_vs_Female")
+
+## Extract significant genes:
+sex_effect_wald_sig <- subset(x = sex_effect_wald,
+                              padj < 0.05)
+
 ## compare smolts and non smolts
 ## The effect of the interction between condition and sex:
 ## 1) Smolt saltwater in comparison to Non-smolt freshwater:
 dds_salt_smolt_vs_fresh_non_smolt_int    <- results(dds_wald,
-                                                    name = "sexMale.groupsalt_Smolt")
+                                                    name =
+                                                            "sexMale.groupsalt_Smolt")
 
 ## Convert to dataframe:
 dds_salt_smolt_vs_fresh_non_smolt_int_df <- as.data.frame(dds_salt_smolt_vs_fresh_non_smolt_int)
@@ -250,6 +267,25 @@ table(table(c(smolt_vs_non_smolts_fresh_lrt_wald,
 ## smolt in comparison to resident saltwater?
 table(table(c(non_smolt_salt_vs_non_smolts_fresh_lrt_wald,
         smolt_vs_non_smolts_salt_lrt_wald)))
+
+## Overlap with the main effect of sex on gene expression:
+sex_effect_wald_gene_list <- row.names(sex_effect_wald_sig)
+sex_effect_wald_gene_list <- gsub(pattern = "[.]1",
+                                  replacement = "",
+                                  sex_effect_wald_gene_list)
+
+## Overlap between genes differentially expressed by sex and:
+## a) smolt SW vs resident FW: 
+table(table(c(smolt_vs_non_smolts_fresh_lrt_wald,
+              sex_effect_wald_gene_list)))
+
+## b) resident SW vs resident FW: 
+table(table(c(non_smolt_salt_vs_non_smolts_fresh_lrt_wald,
+              sex_effect_wald_gene_list)))
+
+## c) smolt SW vs resident SW:
+table(table(c(smolt_vs_non_smolts_salt_lrt_wald,
+              sex_effect_wald_gene_list)))
 ```
 
 Save everything:
