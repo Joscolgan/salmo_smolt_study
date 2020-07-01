@@ -71,6 +71,29 @@ fresh_non_smolt_samples <- c(15:22)
 normalised_counts_reordered <- normalised_counts_df[, c(salt_non_smolt_samples,
                                                         salt_smolt_samples,
                                                         fresh_non_smolt_samples)]
+
+## Update sample names:
+resident_sw <- "resident-SW"
+smolt_sw    <- "smolt-SW"
+resident_fw <- "resident-FW"
+
+length(grep(pattern = "salt_NonSmolt",
+            colnames(normalised_counts_reordered)))
+length(grep(pattern = "salt_Smolt",
+           colnames(normalised_counts_reordered)))
+length(grep(pattern = "fresh_NonSmolt",
+            colnames(normalised_counts_reordered)))
+
+## Generate new sample names for plotting:
+sample_names <- c(paste(resident_sw, "_", 1:8,
+                        sep = ""),
+                  paste(smolt_sw, "_", 1:6,
+                        sep = ""),
+                  paste(resident_fw, "_", 1:8,
+                        sep = ""))
+
+## Rename columns:
+colnames(normalised_counts_reordered) <- sample_names
 ```
 
 Subset genes identified as DEGs between all three comparisons:
