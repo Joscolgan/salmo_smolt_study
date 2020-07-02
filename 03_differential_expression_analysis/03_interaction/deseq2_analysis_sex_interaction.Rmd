@@ -262,6 +262,7 @@ sex_effect_wald_gene_list <- row.names(sex_effect_wald_sig)
 sex_effect_wald_gene_list <- gsub(pattern = "[.]1",
                                   replacement = "",
                                   sex_effect_wald_gene_list)
+length(sex_effect_wald_gene_list)
 
 ## Overlap between genes differentially expressed by sex and:
 ## a) smolt SW vs resident FW: 
