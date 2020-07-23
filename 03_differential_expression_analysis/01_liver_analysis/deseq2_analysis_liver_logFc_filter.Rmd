@@ -231,11 +231,17 @@ Subset significant genes for each comparison:
 
 ```{r, message = FALSE}
 smolt_vs_non_smolts_salt_sig  <- subset(smolt_vs_non_smolts_salt_df,
+                                        log2FoldChange > 1 &
+                                        log2FoldChange < -1 &
                                         padj < 0.05)
 smolt_vs_non_smolts_fresh_sig <- subset(smolt_vs_non_smolts_fresh_df,
+                                        log2FoldChange > 1 &
+                                        log2FoldChange < -1 &
                                         padj < 0.05)
 non_smolt_salt_vs_non_smolts_fresh_sig <- subset(non_smolt_salt_vs_non_smolts_fresh_df,
-                                                 padj < 0.05)
+                                        log2FoldChange > 1 &
+                                        log2FoldChange < -1 &
+                                        padj < 0.05)
 ```
 
 Subset gene name and p value for all genes analysed:
