@@ -1,0 +1,95 @@
+--- 
+title: "Salmo smoltification study"
+output: plot_volcanos.html
+author: Joe Colgan (joscolgan)
+---
+
+First step, load library required for plotting:
+
+```{r, message = FALSE}
+##install.packages("eulerr")
+library(ggplot2)
+```
+
+Next, load input data:
+
+```{r, message = FALSE}
+load(file = "DESeq2_output_liver.RData")
+```
+
+Create Volcano plots:
+
+```{r, message = FALSE}
+## Order genes by significance:
+smolt_vs_non_smolts_fresh_ordered <- smolt_vs_non_smolts_fresh_sig[order(smolt_vs_non_smolts_fresh_sig$padj), ]
+smolt_vs_non_smolts_fresh_ordered$rank <- 1:nrow(smolt_vs_non_smolts_fresh_ordered)
+
+## Subset genes only differentially expressed between:
+## a) smolt-SW and resident-FW:
+smolt_vs_non_smolts_fresh_subset <- subset(smolt_vs_non_smolts_fresh_ordered,
+       !(row.names(smolt_vs_non_smolts_fresh_ordered) %in%
+                 c(row.names(smolt_vs_non_smolts_salt_sig),
+                   row.names(non_smolt_salt_vs_non_smolts_fresh_sig))))
+
+## Plot log2foldchange by adjusted p value per differentially expressed gene:
+smolt_vs_non_smolts_fresh_plot <- ggplot(data = smolt_vs_non_smolts_fresh_sig,
+       aes(x = log2FoldChange,
+           y = padj))+
+        xlim(c(-10, 10)) +
+        geom_point(colour = "black",
+                   alpha = 0.5) +
+        geom_point(data = smolt_vs_non_smolts_fresh_subset,
+               aes(x = log2FoldChange,
+                   y = padj),
+               colour = "red",
+               alpha = 0.8) +
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold",
+                                        size = 12))
+
+## Order genes by significance:
+smolt_vs_non_smolts_salt_ordered <- smolt_vs_non_smolts_salt_sig[order(smolt_vs_non_smolts_salt_sig$padj), ]
+smolt_vs_non_smolts_salt_ordered$rank <- 1:nrow(smolt_vs_non_smolts_salt_ordered)
+
+## Subset genes only differentially expressed between:
+## a) smolt-SW and resident-SW:
+smolt_vs_non_smolts_salt_subset <- subset(smolt_vs_non_smolts_salt_ordered,
+       !(row.names(smolt_vs_non_smolts_salt_ordered) %in%
+                 c(row.names(smolt_vs_non_smolts_fresh_sig),
+                   row.names(non_smolt_salt_vs_non_smolts_fresh_sig))))
+
+## Plot log2foldchange by adjusted p value per differentially expressed gene:
+smolt_vs_non_smolts_salt_plot <- ggplot(data = smolt_vs_non_smolts_salt_sig,
+       aes(x = log2FoldChange,
+           y = padj)) +
+        xlim(c(-10, 10)) +
+        geom_point(colour = "black",
+                   alpha = 0.5) +
+        geom_point(data = smolt_vs_non_smolts_salt_subset,
+               aes(x = log2FoldChange,
+                   y = padj),
+               colour = "orange",
+               alpha = 0.8) +
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold",
+                                        size = 12))
+
+## Generate a combined plot:
+ggarrange(smolt_vs_non_smolts_fresh_plot,
+          smolt_vs_non_smolts_salt_plot,
+          ncol = 2,
+          nrow = 1,
+          labels = c("A",
+                     "B"))
+
+## Save image to file:
+ggsave(file = "results/volcano_plots.png",
+       height = 6,
+       width = 8)
+```
+
+For now, save everything:
+
+```{r, message = FALSE}
+save.image(file = "volcano_output_liver.RData")
+```
