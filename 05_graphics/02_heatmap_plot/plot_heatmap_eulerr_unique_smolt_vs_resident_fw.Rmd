@@ -182,7 +182,7 @@ heatmap_plot <- ggplot(input,
               panel.background = element_blank(),
               legend.position = "bottom") +
         scale_y_discrete(position = "right") +
-        labs(fill = "Fold change")
+        labs(fill = "Absolute normalised gene expression")
 
 ## Print to console:
 heatmap_plot
