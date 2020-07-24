@@ -195,20 +195,20 @@ Compare numbers of differentially expressed genes between treatments of interest
 ## compare smolts and non smolts
 dds_salt_smolt_vs_salt_non_smolt <- results(dds_wald,
                                             contrast = c("group",
-                                                         "salt_NonSmolt",
-                                                         "salt_Smolt"))
+                                                         "salt_Smolt",
+                                                         "salt_NonSmolt"))
 
 
 dds_salt_smolt_vs_fresh_non_smolt <- results(dds_wald,
                                             contrast = c("group",
-                                                         "fresh_NonSmolt",
-                                                         "salt_Smolt"))
+                                                         "salt_Smolt",
+                                                         "fresh_NonSmolt"))
 
 
 dds_salt_non_smolt_vs_fresh_non_smolt <- results(dds_wald,
                                              contrast = c("group",
-                                                          "fresh_NonSmolt",
-                                                          "salt_NonSmolt"))
+                                                          "salt_NonSmolt",
+                                                          "fresh_NonSmolt"))
 ```
 
 Count the number of differentally expressed genes between the groups
