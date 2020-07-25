@@ -9,6 +9,7 @@ First step, load library required for plotting:
 ```{r, message = FALSE}
 ##install.packages("eulerr")
 library(ggplot2)
+library(ggpubr)
 ```
 
 Next, load input data:
@@ -86,6 +87,127 @@ ggarrange(smolt_vs_non_smolts_fresh_plot,
 ggsave(file = "results/volcano_plots.png",
        height = 6,
        width = 8)
+```
+Load in file containing chromosome information:
+
+```{r, message = FALSE}
+gene_location_info <- read.table(file = "data/ensembl/gff/Salmo_trutta.fSalTru1.1.100.genes.bed",
+                                 header = FALSE,
+                                 col.names = c("chrom",
+                                               "start",
+                                               "end",
+                                               "locus"))
+
+## Convert "chrom" to numeric value:
+gene_location_info$chrom <- as.numeric(unlist(gene_location_info$chrom))
+
+## Subset to retain only genes on chromosomes:
+gene_location_info <- subset(gene_location_info,
+                             chrom <= 40)
+```
+
+Check distribution of differentially expressed genes across all 40 chromosomes for smolt-SW vs. resident-FW:
+
+```{r, message = FALSE}
+## Reformat gene names for subsetting:
+smolt_vs_non_smolts_fresh_genes <- gsub(pattern = "[.]1",
+                                        replacement = "",
+                                        row.names(smolt_vs_non_smolts_fresh_sig))
+
+## Match and subset genes of interest:
+smolt_vs_non_smolts_fresh_subset <- subset(smolt_vs_non_smolts_fresh_sig,
+       !(row.names(smolt_vs_non_smolts_fresh_sig) %in%
+                 c(row.names(smolt_vs_non_smolts_salt_sig),
+                   row.names(non_smolt_salt_vs_non_smolts_fresh_sig))))
+
+## Add chromosome information:
+smolt_vs_non_smolts_fresh_sig$chrom <- as.numeric(unlist(gene_location_info[match(smolt_vs_non_smolts_fresh_genes,
+                                                                      gene_location_info$locus), ]$chrom))
+
+## Subset by chromosomes:
+smolt_vs_non_smolts_fresh_sig <- subset(smolt_vs_non_smolts_fresh_sig,
+                                         chrom <= 40)
+
+## Subset genes of interest by chromosomes:
+smolt_vs_non_smolts_fresh_subset <- subset(smolt_vs_non_smolts_fresh_subset,
+                                           chrom <= 40)
+
+## Generate plot:
+smolt_vs_non_smolts_fresh_chrom_plot <- ggplot(data = smolt_vs_non_smolts_fresh_sig,
+                                               aes(x = log2FoldChange,
+                                                   y = padj)) +
+        xlim(c(-10, 10)) +
+        geom_point(colour = "black",
+                   alpha = 0.5) +
+        geom_point(data = smolt_vs_non_smolts_fresh_subset,
+               aes(x = log2FoldChange,
+                   y = padj),
+               colour = "red",
+               alpha = 0.8) +
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold",
+                                        size = 12)) +
+        facet_wrap(~chrom)
+
+## Print to console:
+smolt_vs_non_smolts_fresh_chrom_plot
+
+## Save plot:
+ggsave(file = "results/smolt_vs_non_smolts_fresh_chrom_volcano_plots.png",
+       height = 10,
+       width = 12)
+```
+
+Check distribution of differentially expressed genes across all 40 chromosomes for smolt-SW vs. resident-SW:
+
+```{r, message = FALSE}
+## Reformat gene names for subsetting:
+smolt_vs_non_smolts_salt_genes <- gsub(pattern = "[.]1",
+                                        replacement = "",
+                                        row.names(smolt_vs_non_smolts_salt_sig))
+
+## Match and subset genes of interest:
+smolt_vs_non_smolts_salt_subset <- subset(smolt_vs_non_smolts_salt_sig,
+       !(row.names(smolt_vs_non_smolts_salt_sig) %in%
+                 c(row.names(smolt_vs_non_smolts_fresh_sig),
+                   row.names(non_smolt_salt_vs_non_smolts_fresh_sig))))
+
+## Add chromosome information:
+smolt_vs_non_smolts_salt_sig$chrom <- as.numeric(unlist(gene_location_info[match(smolt_vs_non_smolts_salt_genes,
+                                                                      gene_location_info$locus), ]$chrom))
+
+## Subset by chromosomes:
+smolt_vs_non_smolts_salt_sig <- subset(smolt_vs_non_smolts_salt_sig,
+                                         chrom <= 40)
+
+## Subset genes of interest by chromosomes:
+smolt_vs_non_smolts_salt_subset <- subset(smolt_vs_non_smolts_salt_subset,
+                                           chrom <= 40)
+
+## Generate plot:
+smolt_vs_non_smolts_salt_chrom_plot <- ggplot(data = smolt_vs_non_smolts_salt_sig,
+       aes(x = log2FoldChange,
+           y = padj)) +
+        xlim(c(-10, 10)) +
+        geom_point(colour = "black",
+                   alpha = 0.5) +
+        geom_point(data = smolt_vs_non_smolts_salt_subset,
+               aes(x = log2FoldChange,
+                   y = padj),
+               colour = "orange",
+               alpha = 0.8) +
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold",
+                                        size = 12)) +
+        facet_wrap(~chrom)
+
+## Print to console:
+smolt_vs_non_smolts_salt_chrom_plot
+
+## Save plot:
+ggsave(file = "results/smolt_vs_non_smolts_salt_chrom_volcano_plots.png",
+       height = 10,
+       width = 12)
 ```
 
 For now, save everything:
