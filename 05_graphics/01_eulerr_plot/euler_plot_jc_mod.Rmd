@@ -29,7 +29,8 @@ Create a list of comparisons to plot:
 ```{r, message = FALSE}
 vendiagram <- euler(combinations = list("Smolt-SW vs Resident-SW" = smolt_vs_non_smolts_salt_lrt_wald,
                                         "Smolt-SW vs Resident-FW" = smolt_vs_non_smolts_fresh_lrt_wald,
-                                        "Resident-SW vs Resident-FW" = non_smolt_salt_vs_non_smolts_fresh_lrt_wald))
+                                        "Resident-SW vs Resident-FW" = non_smolt_salt_vs_non_smolts_fresh_lrt_wald),
+                                        shape = "ellipse")
 ```
 
 Plot Venn diagram
