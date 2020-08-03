@@ -1,0 +1,54 @@
+
+## Here include some basic information
+## Name of author:Robert Wynne
+## Date:24/01/2020
+## Program name: .Rmd
+## Purpose of the script: plot euler
+## This script does XX, YYY and ZZZ.
+##
+## Mention what it takes as input
+##
+## It outputs... - We can work on this when I get back.
+
+First step, load library required for plotting:
+
+```{r, message = FALSE}
+##install.packages("eulerr")
+library(eulerr)
+library(ggplot2)
+```
+
+Next, load input data:
+
+```{r, message = FALSE}
+load(file = "DESeq2_output_liver.RData")
+```
+
+Create a list of comparisons to plot:
+
+```{r, message = FALSE}
+vendiagram <- euler(combinations = list("Phenotype genes" = phenotype_contr_env_sig_genes,
+                                        "Osmotic environment genes" = env_contr_phen_sig_genes),
+                                        shape = "ellipse")
+```
+
+Plot Venn diagram
+
+Select all code and run together at the same time to save plot.
+It won't work it execute lines of code indepedently.
+
+```{r, message = FALSE}
+pdf(file = "results/euler_latest_liver_plot.pdf",
+     width = 6,
+     height = 4)
+plot(vendiagram,
+     quantities = TRUE,
+     edges = TRUE)
+dev.off()
+```
+
+For now, save everything:
+
+```{r, message = FALSE}
+save.image(file = "eulerr_output_liver.RData")
+```
