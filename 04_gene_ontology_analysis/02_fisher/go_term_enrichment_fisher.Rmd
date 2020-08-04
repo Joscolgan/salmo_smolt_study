@@ -47,10 +47,9 @@ Load in genelist and database files.
 input <- "data/strutta_drerio_go_terms_filtered_converted.txt"
 ## GO annotations
 gene_to_go_mapping_file <- input
-## genes overlapping with regions of significantly low nucleotide diversity:
-load(file = "eulerr_output_liver.RData")
 
-gene_list <- three_group_gene_list
+## Load list of genes of interest:
+gene_list <- readRDS(file = "ALH_genes.rds")
 
 ## Define node size:
 node_size <- 50
