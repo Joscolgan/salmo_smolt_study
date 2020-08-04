@@ -135,6 +135,25 @@ for (go_category in c("BP", "MF", "CC")) {
               row.names = FALSE,
               sep       = "\t",
               quote = FALSE)
+   ## Subset specific columns as input for plotting on a barchart:
+   result_weight_for_plot <- result_weight_output[, c(1,
+                                                      2,
+                                                      3,
+                                                      7)]
+   ## Subset blanks with underscores:
+   result_weight_for_plot$Term <- gsub(pattern = " ",
+                                       replacement = "_",
+                                       result_weight_for_plot$Term)
+   
+   ## Write to output:
+   write.table(x         = result_weight_for_plot,
+              file      = file.path(output_directory,
+                                    paste(go_category,
+                                          "input_for_plot.txt",
+                                          sep = "_")),
+              row.names = FALSE,
+              sep       = "\t",
+              quote = FALSE)
 }
 ```
 
