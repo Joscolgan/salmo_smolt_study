@@ -51,6 +51,11 @@ gene_to_go_mapping_file <- input
 ## Load list of genes of interest:
 gene_list <- readRDS(file = "ALH_genes.rds")
 
+## Reformat gene list for running GO term analysis:
+gene_list <- gsub(pattern = "[.]1",
+                  replacement = "",
+                  gene_list)
+
 ## Define node size:
 node_size <- 50
 ## Assign name to database:
