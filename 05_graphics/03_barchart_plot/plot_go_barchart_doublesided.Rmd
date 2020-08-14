@@ -1,0 +1,113 @@
+
+
+1. Load libaries:
+
+```{r, message = FALSE}
+require(gglot2)
+require(ggpubr)
+```
+
+2. Load input data for plotting:
+
+```{r, message = FALSE}
+## Load ALH output:
+alh_bp_terms <- read.table(file = "results/strutta_drerio/output_50_fisher_alh/BP_sig.tsv",
+                           header = TRUE)
+## Subset by significance:
+alh_bp_terms_sig <- subset(alh_bp_terms,
+                           weight_fisher_adjusted < 0.05)
+
+alh_bp_terms_sig$log10 <- -log10(alh_bp_terms_sig$weight_fisher_adjusted)
+alh_bp_terms_sig$category <- "ALH-associated genes"
+
+## Load OSM output:
+osm_bp_terms <- read.table(file = "results/strutta_drerio/output_50_fisher_osm/BP_sig.tsv",
+                           header = TRUE)
+## Subset by significance:
+osm_bp_terms_sig <- subset(osm_bp_terms,
+                           weight_fisher_adjusted < 0.05)
+
+osm_bp_terms_sig$log10 <- log10(osm_bp_terms_sig$weight_fisher_adjusted)
+osm_bp_terms_sig$category <- "OSM-associated genes"
+```
+
+3. Generate plot:
+
+```{r, message = FALSE}
+combined_df <- as.data.frame(rbind(alh_bp_terms_sig,
+                                   osm_bp_terms_sig))
+
+combined_df_unique <- subset(combined_df,
+                             !duplicated(combined_df$GO.ID))
+```
+
+4. Generate and save plot:
+
+```{r, message = FALSE}
+## Reannotate:
+combined_df_unique$Term <- gsub(pattern = "_",
+                                replacement = " ",
+                                combined_df_unique$Term)
+
+## Create a column containing amend terms:
+combined_df_unique$amended_terms <- paste(combined_df_unique$Term,
+                                          " ",
+                                          "(",
+                                          combined_df_unique$Annotated,
+                                          ")",
+                                          sep = "")
+
+## Relevel category factors:
+combined_df_unique$category <- factor(combined_df_unique$category,
+                                      levels = c("OSM-associated genes",
+                                                 "ALH-associated genes"))
+
+## Generate plot:
+plot <- ggbarplot(combined_df_unique,
+                          x = "amended_terms",
+                          y = "log10",
+                          position = position_dodge(0.1),
+                          fill = "category",
+                          color = NULL,
+                          palette = "jco",
+                          sort.val = "desc",
+                          sort.by.groups = FALSE,
+                          ylab = "-log10(p)",
+                          xlab = "Gene Ontology term",
+                          legend.title = "Gene categories",
+          x.text.angle = 90,
+                          lab.col = "black",
+                          lab.size = 4,
+                          lab.vjust = 0.5,
+                          lab.hjust = 1,
+                          legend = "top",
+                          rotate = TRUE,
+                          ggtheme = theme_minimal())
+
+## Make font bigger and bold:
+plot <- plot +
+                scale_y_continuous(expand = c(0, 0)) +
+                theme(axis.text = element_text(size = 10),
+                      axis.title.x = element_text(size = 12,
+                                                  face = "bold"),
+                      axis.title.y = element_text(size = 12,
+                                                  face = "bold"),
+                      axis.text.y = element_text(size = 10,
+                                                 face = "bold"),
+                      axis.text.x = element_text(size = 10),
+                      legend.position = "none") +
+                expand_limits(y = 10) +
+                geom_hline(yintercept = 1.301,
+                           linetype = "dashed",
+                           colour = "black") +
+                geom_hline(yintercept = -1.301,
+                           linetype = "dashed",
+                           colour = "black")
+
+## Save picture:
+ggsave(file = "results/liver_alh_osm_go_terms_barchart.png",
+       height = 20,
+       width = 18)
+```
+
+```
