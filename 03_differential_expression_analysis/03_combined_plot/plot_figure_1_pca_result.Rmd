@@ -1,0 +1,57 @@
+
+
+
+1. Load libraries:
+
+```{r, message = FALSE}
+require(ggplot2)
+require(ggpubr)
+```
+
+2. Load saved images:
+
+```{r, message = FALSE}
+liver_pca <- readRDS(file = "results/figures_for_ms/figure_1a_liver_pca.rds")
+brain_pca <- readRDS(file = "results/figures_for_ms/figure_1b_brain_pca.rds")
+```
+
+3. Generate combined plot:
+
+```{r, message = FALSE}
+## Update legend for liver PCA plot:
+liver_pca <- liver_pca +
+        theme(
+                legend.title = element_text(size = 12,
+                                              face = "bold"),
+                  legend.text = element_text(size = 12,
+                                              face = "plain"))
+
+## Update legend:
+brain_pca <- brain_pca +
+        theme(
+                legend.title = element_text(size = 12,
+                                              face = "bold"),
+                  legend.text = element_text(size = 12,
+                                              face = "plain"))
+
+## Generate arranged plot:
+ggarrange(liver_pca,
+          brain_pca,
+          ncol = 2,
+          nrow = 1,
+          align = "hv",
+          labels = c("A",
+                     "B"),
+          common.legend = TRUE,
+          legend = "top")
+
+## Save image and output in .PNG format:
+ggsave(file = "results/figures_for_ms/figure_1a_b_combined.png",
+       height = 5,
+       width = 10)
+
+## Save image and output in .PDF format:
+ggsave(file = "results/figures_for_ms/figure_1a_b_combined.pdf",
+       height = 8,
+       width = 10)
+```
