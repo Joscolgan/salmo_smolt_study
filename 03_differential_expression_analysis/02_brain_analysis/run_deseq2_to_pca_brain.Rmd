@@ -14,7 +14,8 @@ The script outputs:
 
 ```{r, message = FALSE}
 ## Load libraries:
-library(apeglm)
+#library(apeglm)
+library(biomaRt)
 library(ggplot2)
 library(DESeq2)
 library(RCurl)
@@ -220,7 +221,11 @@ plotPCA.san <- function(object,
            aes_string(x = "PC1",
                       y = "PC2",
                       color = "group")) +
-            geom_point(size = 3) +
+            geom_point(data = d,
+                       aes(fill = group),
+                       colour = "black",
+                       pch = 21,
+                       size = 3) +
             xlab(paste0("PC", first_pc, ": ",
                         round(percentVar[first_pc] * 100),
                         "% variance")) +
@@ -236,7 +241,7 @@ plotPCA.san <- function(object,
                                            face = "plain"),
                   legend.title = element_text(size = 10,
                                               face = "bold")) +
-            scale_colour_discrete(name = "Phenotype",
+            scale_fill_discrete(name = "Phenotype",
                                   labels = c("Resident-FW",
                                              "Resident-SW",
                                              "Smolt-SW"))
@@ -273,7 +278,7 @@ ggsave(brain_pca_plot,
 6. Save everything:
 
 ```{r, message = FALSE}
-save.image(file = "DESeq2_output_brain.RData")
+save.image(file = "results/DESeq2_output_brain.RData")
 ```
 
 7. Run lintr to check style guide:
