@@ -151,6 +151,26 @@ length(env_contr_phen_sig_genes)
 2 = "environment genes" (env_contr_phen_sig_genes), i.e. genes that are differentially expressed between fresh and salt water, after having controlled statistically for phenotype.
 
 ```{r, message = FALSE}
+## Load gene name:
+require(biomaRt)
+ensembl <- useMart("ensembl")
+datasets <- listDatasets(ensembl)
+ensembl <- useEnsembl("strutta_gene_ensembl",
+                      version = "101",
+                     biomart = "ensembl")
+salmo_description <- getBM(attributes = c('ensembl_gene_id',
+                                   'entrezgene_description',
+                                   'chromosome_name',
+                                   'start_position',
+                                   'end_position'),
+                    mart = ensembl)
+## Annotate ensembl gene id:
+salmo_description$ensembl_gene_id <- paste(salmo_description$ensembl_gene_id,
+                                           ".1",
+                                           sep = "")
+```
+
+```{r, message = FALSE}
 # We are now in a position to make our venn diagram (see Euler plot code) showing the extent to which these phenotype and environment genes overlap.  But we can see this in numbers like this:
 phen_and_env_genes <- intersect(phenotype_contr_env_sig_genes,
                                 env_contr_phen_sig_genes)
@@ -160,6 +180,24 @@ length(phen_and_env_genes)
 phen_not_env_genes <- setdiff(phenotype_contr_env_sig_genes,
                               env_contr_phen_sig_genes)
 length(phen_not_env_genes)
+
+## Subset these genes and write to file:
+phen_not_env_genes_df <- as.data.frame(subset(phenotype_effect_contr_env,
+                                row.names(phenotype_effect_contr_env) %in% 
+                                        phen_not_env_genes))
+## Order by log2FC:
+phen_not_env_genes_df <- phen_not_env_genes_df[order(phen_not_env_genes_df$log2FoldChange), ]
+
+## Match and order:
+phen_not_env_genes_df$annotation <- salmo_description[match(row.names(phen_not_env_genes_df), salmo_description$ensembl_gene_id), ]
+
+## Save to file:
+write.table(phen_not_env_genes_df,
+            file = "results/phen_not_env_genes_sig_brain.txt",
+            row.names = TRUE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
 
 # And here is the number of unique environment genes (i.e. DE between environments but not between phenotypes):
 env_not_phen_genes <- setdiff(env_contr_phen_sig_genes,
