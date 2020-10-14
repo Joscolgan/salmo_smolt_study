@@ -203,7 +203,7 @@ phen_not_env_genes_df$annotation <- salmo_description[match(row.names(phen_not_e
 
 ## Save to file:
 write.table(phen_not_env_genes_df,
-            file = "results/phen_not_env_genes_sig.txt",
+            file = "results/phen_not_env_genes_sig_liver.txt",
             row.names = TRUE,
             col.names = TRUE,
             quote = FALSE,
@@ -328,7 +328,7 @@ ggsave(liver_pca_plot,
 6. Save everything:
 
 ```{r, message = FALSE}
-save.image(file = "DESeq2_output_liver.RData")
+save.image(file = "results/figures_for_ms/DESeq2_output_liver.RData")
 ```
 
 7. Run lintr to check style guide:
