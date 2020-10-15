@@ -49,15 +49,18 @@ input <- "data/strutta_drerio_go_terms_filtered_converted.txt"
 gene_to_go_mapping_file <- input
 
 ## Load list of genes of interest:
-gene_list <- readRDS(file = "ALH_genes.rds")
-
-## Reformat gene list for running GO term analysis:
+gene_list <- readRDS(file = "phen_NOT_env_data_block2.rds")
+gene_list <- row.names(as.data.frame(gene_list))
 gene_list <- gsub(pattern = "[.]1",
                   replacement = "",
                   gene_list)
 
+## Print the number of genes to console:
+length(gene_list)
+        
 ## Define node size:
 node_size <- 50
+
 ## Assign name to database:
 database <- "strutta_drerio"
 ## Name output directory:
@@ -65,7 +68,7 @@ output_directory <- paste("results/",
                           database,
                           "/output_",
                           node_size,
-                          "_fisher_all",
+                          "_phen_NOT_env_data_block2",
                           sep = "")
 if (file.exists(output_directory)) {
   stop("The output directory:", output_directory, ", already exists",
@@ -81,10 +84,10 @@ Read in input file:
 ```{r, message = FALSE}
 ## Read in GO annotations:
 gene_to_go_mapping <- readMappings(file = gene_to_go_mapping_file)
-gene_universe <- names(gene_to_go_mapping)
-genes_of_interest <- as.character(gene_list)
-genelist <- factor(as.integer(gene_universe %in% genes_of_interest))
-names(genelist) <- gene_universe
+gene_universe      <- names(gene_to_go_mapping)
+genes_of_interest  <- as.character(gene_list)
+genelist           <- factor(as.integer(gene_universe %in% genes_of_interest))
+names(genelist)    <- gene_universe
 ```
 
 ## Steps Two and Three: Create topGO Object & run tests for GO term enrichment
@@ -126,30 +129,23 @@ for (go_category in c("BP", "MF", "CC")) {
   result_weight_output$weight_fisher <- as.numeric(result_weight_output$weight_fisher)
   result_weight_output$weight_fisher_adjusted <- p.adjust(p = result_weight_output$weight_fisher,
                                                           method = c("BH"))
-  ## Write to output:
+  ## Subet based on significance:
+  result_weight_sig <- subset(result_weight_output,
+                              weight_fisher_adjusted < 0.05)
+  ## Write raw results to output:
   write.table(x         = result_weight_output,
               file      = file.path(output_directory,
                                     paste(go_category,
-                                          "sig.tsv",
+                                          "raw.tsv",
                                           sep = "_")),
               row.names = FALSE,
               sep       = "\t",
               quote = FALSE)
-   ## Subset specific columns as input for plotting on a barchart:
-   result_weight_for_plot <- result_weight_output[, c(1,
-                                                      2,
-                                                      3,
-                                                      7)]
-   ## Subset blanks with underscores:
-   result_weight_for_plot$Term <- gsub(pattern = " ",
-                                       replacement = "_",
-                                       result_weight_for_plot$Term)
-   
-   ## Write to output:
-   write.table(x         = result_weight_for_plot,
+  ## Write significant results to output: 
+  write.table(x         = result_weight_sig,
               file      = file.path(output_directory,
                                     paste(go_category,
-                                          "input_for_plot.txt",
+                                          "sig.tsv",
                                           sep = "_")),
               row.names = FALSE,
               sep       = "\t",
