@@ -1,0 +1,126 @@
+
+
+1. Load libaries:
+
+```{r, message = FALSE}
+require(ggplot2)
+require(ggpubr)
+```
+
+2. Load input data for plotting:
+
+```{r, message = FALSE}
+## Read in Gene Ontology terms enriched for resident genes:
+resident_dir <- "results/figures_for_ms/strutta_drerio/output_50_phen_not_env_genes_resident/"
+
+## Load ALH output:
+resident_bp_terms <- read.table(file = paste(resident_dir,
+                                              "BP_sig.txt",
+                                              sep = ""),
+                           header = TRUE)
+
+resident_bp_terms$log10 <- -log10(resident_bp_terms$weight_fisher_adjusted)
+resident_bp_terms$category <- "Resident-biased genes"
+
+## Read in Gene Ontology terms enriched for resident genes:
+smolt_dir <- "results/figures_for_ms/strutta_drerio/output_50_phen_not_env_genes_smolt/"
+
+## Subset by significance:
+smolt_bp_terms <- read.table(file = paste(smolt_dir,
+                                              "BP_sig.txt",
+                                              sep = ""),
+                           header = TRUE)
+
+smolt_bp_terms$log10 <- -log10(smolt_bp_terms$weight_fisher_adjusted)
+smolt_bp_terms$category <- "Smolt-biased genes"
+```
+
+3. Generate plot:
+
+```{r, message = FALSE}
+combined_df <- as.data.frame(rbind(resident_bp_terms,
+                                   smolt_bp_terms))
+
+combined_df_unique <- subset(combined_df,
+                             !duplicated(combined_df$GO.ID))
+```
+
+4. Generate and save plot:
+
+```{r, message = FALSE}
+## Reannotate:
+combined_df_unique$Term <- gsub(pattern = "_",
+                                replacement = " ",
+                                combined_df_unique$Term)
+
+## Create a column containing amend terms:
+combined_df_unique$amended_terms <- paste(combined_df_unique$Term,
+                                          " ",
+                                          "(",
+                                          combined_df_unique$Annotated,
+                                          ")",
+                                          sep = "")
+
+## Relevel category factors:
+combined_df_unique$category <- factor(combined_df_unique$category,
+                                      levels = c("Resident-biased genes",
+                                                 "Smolt-biased genes"))
+
+## Generate plot:
+plot <- ggbarplot(combined_df_unique,
+                  x = "amended_terms",
+                  y = "log10",
+                  position = position_dodge(0.1),
+                  fill = "category",
+                  color = NULL,
+                  palette = "jco",
+                  sort.val = "desc",
+                  sort.by.groups = TRUE,
+                  ylab = "-log10(p)",
+                  xlab = "Enriched Gene Ontology term",
+                  legend.title = "Gene categories",
+                  x.text.angle = 90,
+                  lab.col = "black",
+                  lab.size = 4,
+                  lab.vjust = 0.5,
+                  lab.hjust = 1,
+                  legend = "top",
+                  rotate = FALSE,
+                  ggtheme = theme_minimal())
+
+## Make font bigger and bold:
+plot <- plot +
+                scale_y_continuous(expand = c(0, 0)) +
+                theme(axis.text = element_text(size = 10),
+                      axis.title.x = element_text(size = 12,
+                                                  face = "bold"),
+                      axis.title.y = element_text(size = 12,
+                                                  face = "bold"),
+                      axis.text.y = element_text(size = 10,
+                                                 face = "bold"),
+                      axis.text.x = element_text(size = 10),
+                      legend.position = "top",
+                      legend.title = element_text(size = 10,
+                                                  face = "bold")) +
+                expand_limits(y = 10) +
+                geom_hline(yintercept = 1.301,
+                           linetype = "dashed",
+                           colour = "black") +
+                geom_hline(yintercept = -1.301,
+                           linetype = "dashed",
+                           colour = "black")
+
+## Save picture:
+output_dir <- "results/figures_for_ms/"
+ggsave(file = paste(output_dir,
+                    "fig_3_go_terms_barchart_liver.png",
+                    sep = ""),
+       height = 8,
+       width = 10)
+```
+
+6. Run lintr:
+
+```{r, message = FALSE}
+lintr::lint(file = "plot_go_term_barchart.Rmd")
+```
