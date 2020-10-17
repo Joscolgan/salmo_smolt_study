@@ -15,12 +15,12 @@ The script outputs:
 ```{r, message = FALSE}
 ## Load libraries:
 #library(apeglm)
-library(biomaRt)
 library(ggplot2)
 library(DESeq2)
 library(RCurl)
 library(stringi)
 library(tximport)
+library(biomaRt)
 # Check version using sessionInfo
 # E.g. sessionInfo("DESeq2")
 ```
@@ -152,7 +152,6 @@ length(env_contr_phen_sig_genes)
 
 ```{r, message = FALSE}
 ## Load gene name:
-require(biomaRt)
 ensembl <- useMart("ensembl")
 datasets <- listDatasets(ensembl)
 ensembl <- useEnsembl("strutta_gene_ensembl",
@@ -164,10 +163,27 @@ salmo_description <- getBM(attributes = c('ensembl_gene_id',
                                    'start_position',
                                    'end_position'),
                     mart = ensembl)
+
 ## Annotate ensembl gene id:
 salmo_description$ensembl_gene_id <- paste(salmo_description$ensembl_gene_id,
                                            ".1",
                                            sep = "")
+
+## Assign gene description to each locus:
+phenotype_effect_contr_env_df <- as.data.frame(phenotype_effect_contr_env)
+phenotype_effect_contr_env_df$locus <- row.names(phenotype_effect_contr_env_df)
+
+## Match gene description to locus id:
+phenotype_effect_contr_env_df$descripton <- salmo_description[match(phenotype_effect_contr_env_df$locus,
+                                                                    salmo_description$ensembl_gene_id), ]
+
+## Write to file:
+write.table(phenotype_effect_contr_env_df,
+            file = "results/figures_for_ms/phenotype_effect_contr_env_brain.txt",
+            row.names = TRUE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
 ```
 
 ```{r, message = FALSE}
@@ -193,7 +209,7 @@ phen_not_env_genes_df$annotation <- salmo_description[match(row.names(phen_not_e
 
 ## Save to file:
 write.table(phen_not_env_genes_df,
-            file = "results/phen_not_env_genes_sig_brain.txt",
+            file = "results/figures_for_ms/phen_not_env_genes_sig_brain.txt",
             row.names = TRUE,
             col.names = TRUE,
             quote = FALSE,
@@ -316,7 +332,7 @@ ggsave(brain_pca_plot,
 6. Save everything:
 
 ```{r, message = FALSE}
-save.image(file = "results/DESeq2_output_brain.RData")
+save.image(file = "results/figures_for_ms/DESeq2_output_brain.RData")
 ```
 
 7. Run lintr to check style guide:
