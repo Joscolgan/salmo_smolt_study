@@ -20,6 +20,7 @@ library(DESeq2)
 library(RCurl)
 library(stringi)
 library(tximport)
+library(biomaRt)
 # Check version using sessionInfo
 # E.g. sessionInfo("DESeq2")
 ```
@@ -158,8 +159,6 @@ length(env_contr_phen_sig_genes)
 
 ```{r, message = FALSE}
 ## Load gene name:
-require(biomaRt)
-
 ensembl <- useMart("ensembl")
 datasets <- listDatasets(ensembl)
 ensembl <- useEnsembl("strutta_gene_ensembl",
@@ -167,17 +166,70 @@ ensembl <- useEnsembl("strutta_gene_ensembl",
                      biomart = "ensembl")
 
 salmo_description <- getBM(attributes = c('ensembl_gene_id',
-                                   'entrezgene_description',
-                                   'chromosome_name',
-                                   'start_position',
-                                   'end_position'),
-                    mart = ensembl)
+                                          'entrezgene_description',
+                                          'chromosome_name',
+                                          'start_position',
+                                          'end_position'),
+                           mart = ensembl)
 
 ## Annotate ensembl gene id:
 salmo_description$ensembl_gene_id <- paste(salmo_description$ensembl_gene_id,
                                            ".1",
                                            sep = "")
+
+## Assign gene description for gene-level counts per gene:
+txi_df <- as.data.frame(txi$counts)
+                        
+## Update column names:
+colnames(txi_df) <- rna_sample_info_liver$sample
+
+## Match gene description to locus id:
+txi_df$descripton <- salmo_description[match(row.names(txi_df),
+                                             salmo_description$ensembl_gene_id), ]
+
+## Write to file:
+write.table(txi_df,
+            file = "results/figures_for_ms/gene_counts_liver.txt",
+            row.names = TRUE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
+
+## Assign gene description to each locus:
+phenotype_effect_contr_env_df <- as.data.frame(phenotype_effect_contr_env)
+phenotype_effect_contr_env_df$locus <- row.names(phenotype_effect_contr_env_df)
+
+## Match gene description to locus id:
+phenotype_effect_contr_env_df$descripton <- salmo_description[match(phenotype_effect_contr_env_df$locus,
+                                                                    salmo_description$ensembl_gene_id), ]
+
+## Write to file:
+write.table(phenotype_effect_contr_env_df,
+            file = "results/figures_for_ms/phenotype_effect_contr_env_liver.txt",
+            row.names = TRUE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
+
+
+## Assign gene description to each locus:
+env_effect_contr_phen_df <- as.data.frame(env_effect_contr_phen)
+env_effect_contr_phen_df$locus <- row.names(env_effect_contr_phen)
+
+## Match gene description to locus id:
+env_effect_contr_phen_df$descripton <- salmo_description[match(env_effect_contr_phen_df$locus,
+                                                               salmo_description$ensembl_gene_id), ]
+
+## Write to file:
+write.table(env_effect_contr_phen_df,
+            file = "results/figures_for_ms/env_effect_contr_phen_liver.txt",
+            row.names = TRUE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
 ```
+
+5. Identify specific genes that show biases between alternative phenotypes:
 
 ```{r, message = FALSE}
 # We are now in a position to make our venn diagram (see Euler plot code) showing the extent to which these phenotype and environment genes overlap.  But we can see this in numbers like this:
@@ -215,7 +267,7 @@ env_not_phen_genes <- setdiff(env_contr_phen_sig_genes,
 length(env_not_phen_genes)
 ```
 
-5. Generate PCA plots to explore expression profiles amongst individuals and treatments:
+6. Generate PCA plots to explore expression profiles amongst individuals and treatments:
 
 ```{r, message = FALSE}
 ## Transform data for plotting:
@@ -325,13 +377,13 @@ ggsave(liver_pca_plot,
        width = 6)
 ```
 
-6. Save everything:
+7. Save everything:
 
 ```{r, message = FALSE}
 save.image(file = "results/figures_for_ms/DESeq2_output_liver.RData")
 ```
 
-7. Run lintr to check style guide:
+8. Run lintr to check style guide:
 
 ```{r, message = FALSE}
 lintr::lint(file = "run_deseq2_to_pca_liver.Rmd")
