@@ -169,6 +169,30 @@ salmo_description$ensembl_gene_id <- paste(salmo_description$ensembl_gene_id,
                                            ".1",
                                            sep = "")
 
+## Assign gene description for gene-level counts per gene:
+txi_df <- as.data.frame(txi$counts)
+                        
+## Update column names:
+colnames(txi_df) <- rna_sample_info_brain$sample
+
+## Assign gene description for gene-level counts per gene:
+txi_df <- as.data.frame(txi$counts)
+                        
+## Update column names:
+colnames(txi_df) <- rna_sample_info_brain$sample
+
+## Match gene description to locus id:
+txi_df$descripton <- salmo_description[match(row.names(txi_df),
+                                             salmo_description$ensembl_gene_id), ]
+
+## Write to file:
+write.table(txi_df,
+            file = "results/figures_for_ms/gene_counts_brain.txt",
+            row.names = TRUE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
+
 ## Assign gene description to each locus:
 phenotype_effect_contr_env_df <- as.data.frame(phenotype_effect_contr_env)
 phenotype_effect_contr_env_df$locus <- row.names(phenotype_effect_contr_env_df)
@@ -180,6 +204,23 @@ phenotype_effect_contr_env_df$descripton <- salmo_description[match(phenotype_ef
 ## Write to file:
 write.table(phenotype_effect_contr_env_df,
             file = "results/figures_for_ms/phenotype_effect_contr_env_brain.txt",
+            row.names = TRUE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
+
+
+## Assign gene description to each locus:
+env_effect_contr_phen_df <- as.data.frame(env_effect_contr_phen)
+env_effect_contr_phen_df$locus <- row.names(env_effect_contr_phen)
+
+## Match gene description to locus id:
+env_effect_contr_phen_df$descripton <- salmo_description[match(env_effect_contr_phen_df$locus,
+                                                               salmo_description$ensembl_gene_id), ]
+
+## Write to file:
+write.table(env_effect_contr_phen_df,
+            file = "results/figures_for_ms/env_effect_contr_phen_brain.txt",
             row.names = TRUE,
             col.names = TRUE,
             quote = FALSE,
