@@ -1,7 +1,7 @@
 # _Salmo_ smoltification RNA-Seq study   
 
 Context & citation:  
-This repository contains scripts for the analysis of life-history genes in the brown trout _Salmo trutta_.
+This repository contains scripts for the analysis of life-history genes in the brown trout _Salmo trutta_.  
 
 For the present analysis, the following steps were taken:  
 ### 1) Quality assessment:  
@@ -14,7 +14,7 @@ Differential expression analysis was performed using [DESeq2](https://bioconduct
 ### 4) Gene Ontology Enrichment analysis:
 For differentially expressed genes identified between and across treatments, Gene Ontology enrichment analysis was performed using [topGO](https://bioconductor.org/packages/release/bioc/html/topGO.html).  
 ### 5) Plots:  
-Plots, such as barcharts and heatmaps, were generated using [ggplot2](https://ggplot2.tidyverse.org/).  
+Plots, such as barcharts and heatmaps, were generated using [ggpubr](https://cran.r-project.org/web/packages/ggpubr/index.html) and [ggplot2](https://ggplot2.tidyverse.org/).  
 For plots, such as Venn diagrams, [Eulerr](https://cran.r-project.org/web/packages/eulerr/index.html) was used.  
 
 Some scripts contained in this repository are modifications of scripts used by [Colgan et el. (2019, Molecular Ecology)](https://onlinelibrary.wiley.com/doi/full/10.1111/mec.15047). If reusing scripts within the present repository, please cite the original source as well and follow instructions on reuse.
