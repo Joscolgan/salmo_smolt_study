@@ -211,7 +211,6 @@ write.table(phenotype_effect_contr_env_df,
             quote = FALSE,
             sep = "\t")
 
-
 ## Assign gene description to each locus:
 env_effect_contr_phen_df <- as.data.frame(env_effect_contr_phen)
 env_effect_contr_phen_df$locus <- row.names(env_effect_contr_phen)
@@ -252,6 +251,27 @@ phen_not_env_genes_df <- phen_not_env_genes_df[order(phen_not_env_genes_df$log2F
 
 ## Match and order:
 phen_not_env_genes_df$annotation <- salmo_description[match(row.names(phen_not_env_genes_df), salmo_description$ensembl_gene_id), ]
+
+## Annotate DESeq2 output with AMT information:
+phenotype_effect_contr_env_df$is_amt <- phenotype_effect_contr_env_df$locus %in% phen_not_env_genes
+
+## Sort by AMT presence and adjust p value:
+phenotype_effect_contr_env_df <- phenotype_effect_contr_env_df[
+        order( -phenotype_effect_contr_env_df[ , 10],
+               phenotype_effect_contr_env_df[ , 6] ),
+        ]
+
+## Save to file:
+write.table(phenotype_effect_contr_env_df,
+            file = "results/phenotype_effect_contr_env_liver_annotated.txt",
+            row.names = FALSE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
+
+## Save as an RDS:
+saveRDS(object = phenotype_effect_contr_env_df,
+        file = "results/phenotype_effect_contr_env_liver_annotated.Rds")
 
 ## Save to file:
 write.table(phen_not_env_genes_df,
