@@ -1,4 +1,8 @@
-
+---
+title: "Salmo smolt study"
+output: plot_go_term_barchart.html
+authors: Robert Wynne, Tom Reed, Joe Colgan (joscolgan)
+---
 
 1. Load libaries:
 

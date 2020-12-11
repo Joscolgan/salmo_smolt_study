@@ -1,7 +1,7 @@
 --- 
 title: "Salmo sex study"
 output: go_enrichment_analysis_fisher.html
-author: Joe Colgan (joscolgan)
+authors: Robert Wynne, Tom Reed, Joe Colgan (joscolgan)
 ---
 
 # Introduction 
