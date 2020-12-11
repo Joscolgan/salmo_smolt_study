@@ -1,0 +1,166 @@
+
+
+1. Load libraries:
+
+```{r, message = FALSE}
+require(biomaRt)
+```
+
+2. Load annotated DESeq2 dataset:
+
+```{r, message = FALSE}
+deseq2_output <- readRDS(file = "results/phenotype_effect_contr_env_liver_annotated.Rds")
+```
+
+3. Load Gene Ontology terms:
+
+```{r, message = FALSE}
+## Load database to identify gene ontology terms assigned to genes of interest:
+go_term_database <- read.table(file = "data/strutta_drerio_go_terms_filtered_converted.txt",
+                               header = FALSE,
+                               col.names = c("gene_id",
+                                             "go_term"))
+
+## Load output of topGO with enriched terms:
+go_dir <- "results/figures_for_ms/strutta_drerio/output_50_phen_not_env_genes_resident/"
+
+enriched_res_bp <- read.table(file = paste(go_dir,
+                                             "BP_sig.txt",
+                                             sep = ""),
+                                header = TRUE)
+
+enriched_res_mf <- read.table(file = paste(go_dir,
+                                             "MF_sig.txt",
+                                             sep = ""),
+                                header = TRUE)
+
+enriched_res_cc <- read.table(file = paste(go_dir,
+                                             "CC_sig.txt",
+                                             sep = ""),
+                                header = TRUE)
+
+## Combine enriched terms for residents:
+enriched_terms_residents <- c(as.character(unlist(enriched_res_bp$GO.ID)),
+                              as.character(unlist(enriched_res_mf$GO.ID)),
+                              as.character(unlist(enriched_res_cc$GO.ID)))
+
+## Load output of topGO with enriched terms:
+go_dir <- "results/figures_for_ms/strutta_drerio/output_50_phen_not_env_genes_smolt/"
+
+enriched_smolt_bp <- read.table(file = paste(go_dir,
+                                             "BP_sig.txt",
+                                             sep = ""),
+                                header = TRUE)
+
+enriched_smolt_mf <- read.table(file = paste(go_dir,
+                                             "MF_sig.txt",
+                                             sep = ""),
+                                header = TRUE)
+
+enriched_smolt_cc <- read.table(file = paste(go_dir,
+                                             "CC_sig.txt",
+                                             sep = ""),
+                                header = TRUE)
+
+## Combine enriched terms for residents:
+enriched_terms_smolts <- c(as.character(unlist(enriched_smolt_bp$GO.ID)),
+                           as.character(unlist(enriched_smolt_mf$GO.ID)),
+                           as.character(unlist(enriched_smolt_cc$GO.ID)))
+
+## Combined enriched resident and smolt terms:
+enriched_terms_sig  <- unique(sort(c(enriched_terms_residents,
+                                     enriched_terms_smolts)))
+```
+
+4. Identify if putative associated AMT gene is annotated with enriched GO term:
+
+```{r, message = FALSE}
+df <- data.frame()
+for (name in enriched_terms_sig) {
+        print(name)
+        df <- rbind(go_term_database[grep(pattern = name,
+                              go_term_database$go_term), ],
+                    df)
+}
+
+## Remove extension from locus:
+deseq2_output$locus <- gsub(pattern = "[.]1",
+                            replacement = "",
+                            deseq2_output$locus)
+
+deseq2_output$enriched_term <- deseq2_output$locus %in% df$gene_id
+
+## Subset:
+nrow(deseq2_output)
+nrow(subset(deseq2_output,
+            is_amt == TRUE &
+            enriched_term == TRUE))
+
+## AMT genes:
+amt_genes <- subset(deseq2_output,
+                    is_amt == TRUE)
+```
+
+5. Add specific enriched terms as a separate column:
+
+```{r, message = FALSE}
+## Create gene list:
+gene_list <- as.character(unlist(go_term_database$gene_id))
+
+## Extract GO terms for each gene:
+tmp_df <- data.frame()
+for (gene in 1:length(gene_list)) {
+        print(gene)
+        tmp_df <- rbind(as.data.frame(cbind(rep(as.character(unlist(go_term_database$gene_id[gene])),
+                        length(strsplit(as.character(unlist(go_term_database$go_term[gene])),
+                                        split = ",")[[1]])),
+                    strsplit(as.character(unlist(go_term_database$go_term[gene])),
+                             split = ",")[[1]])),
+                tmp_df)
+}
+
+## Update column names:
+colnames(tmp_df) <- c("gene_id",
+                      "go_term")
+
+## Subset genes with enriched GO terms:
+amt_with_enriched_terms <- subset(tmp_df,
+                                  gene_id %in% amt_genes &
+                                  go_term %in% enriched_terms_sig)
+
+mymerge <- function(x){
+        all_in_one <- paste(unlist(x),
+        sep = ",",
+        collapse = ",")
+        split_term <- unlist(strsplit(all_in_one,
+        split = ","))
+        return(paste(unique(split_term),
+        sep = ",",
+        collapse = ","))
+}
+
+## Aggregate second column based on the first column:
+output_file <- aggregate(amt_with_enriched_terms[-1],
+              by = list(amt_with_enriched_terms$gene_id), mymerge)
+
+## Assigned enriched Gene Ontology term to matched gene:
+deseq2_output$specific_term <- output_file[match(deseq2_output$locus,
+                                                 output_file$Group.1), ]$go_term
+```
+
+6. Write dataframe to file:
+
+```{r, message = FALSE}
+write.table(deseq2_output,
+            file = "results/supplemental_table_deseq2_annotated.txt",
+            row.names = FALSE,
+            col.names = TRUE,
+            sep = "\t",
+            quote = FALSE)
+```
+
+7. Run lintr:
+
+```{r, message = FALSE}
+lintr::lint(file = "annotate_supp_table.Rmd")
+```
