@@ -1,7 +1,7 @@
 --- 
 title: "Salmo smoltification study"
-output: deseq2_analysis_sex_interaction.html
-authors: Rob Wynne, Joe Colgan (joscolgan)
+output: sex_bias_brain_script.html
+authors: Robert Wynne, Tom Reed, Joe Colgan (joscolgan)
 ---
   
 1. Load libraries:
