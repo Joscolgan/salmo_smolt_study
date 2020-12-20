@@ -13,9 +13,14 @@ Gene-level counts were calculated using [tximport](https://bioconductor.org/pack
 Differential expression analysis was performed using [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html).  
 ### 4) Gene Ontology Enrichment analysis:
 For differentially expressed genes identified between and across treatments, Gene Ontology enrichment analysis was performed using [topGO](https://bioconductor.org/packages/release/bioc/html/topGO.html).  
+GO term database was constructed using datasets available from [Ensembl](https://www.ensembl.org/index.html).  
 ### 5) Plots:  
 Plots, such as barcharts and heatmaps, were generated using [ggpubr](https://cran.r-project.org/web/packages/ggpubr/index.html) and [ggplot2](https://ggplot2.tidyverse.org/).  
 For plots, such as Venn diagrams, [Eulerr](https://cran.r-project.org/web/packages/eulerr/index.html) was used.  
+
+Computational support was kindly provided by the [Irish Centre for High-End Computing (ICHEC)](https://www.ichec.ie/).  
+
+
 
 Some scripts contained in this repository are modifications of scripts used by [Colgan et el. (2019, Molecular Ecology)](https://onlinelibrary.wiley.com/doi/full/10.1111/mec.15047). If reusing scripts within the present repository, please cite the original source as well and follow instructions on reuse.
 The original scripts are publically available at: https://github.com/wurmlab/Bter_neonicotinoid_exposure_experiment  
