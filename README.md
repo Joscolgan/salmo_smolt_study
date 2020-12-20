@@ -3,7 +3,7 @@
 Context & citation:  
 This repository contains scripts for the analysis of life-history genes in the brown trout _Salmo trutta_.  
 The manuscript detailing the results of this analysis are currently under consideration at _Molecular Ecology_:  
-#### Alternative migratory tactics in brown trout (_Salmo trutta_) are underpinned by divergent regulation of metabolic but not neurological genes.  
+### Alternative migratory tactics in brown trout (_Salmo trutta_) are underpinned by divergent regulation of metabolic but not neurological genes.
 Robert Wynne, Louise C. Archer, Stephen A. Hutton, Luke Harman, Patrick Gargan, Peter A. Moran, Eileen Dillane, Jamie Coughlan, Thomas F. Cross, Philip McGinnity, Thomas J. Colgan and Thomas E. Reed 
 
 For the present analysis, the following steps were taken:  
@@ -23,8 +23,5 @@ For plots, such as Venn diagrams, [Eulerr](https://cran.r-project.org/web/packag
 
 Computational support was kindly provided by the [Irish Centre for High-End Computing (ICHEC)](https://www.ichec.ie/).  
 
-
-
 Some scripts contained in this repository are modifications of scripts used by [Colgan et el. (2019, Molecular Ecology)](https://onlinelibrary.wiley.com/doi/full/10.1111/mec.15047). If reusing scripts within the present repository, please cite the original source as well and follow instructions on reuse.
 The original scripts are publically available at: https://github.com/wurmlab/Bter_neonicotinoid_exposure_experiment  
-
