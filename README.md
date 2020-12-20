@@ -2,12 +2,15 @@
 
 Context & citation:  
 This repository contains scripts for the analysis of life-history genes in the brown trout _Salmo trutta_.  
+The manuscript detailing the results of this analysis are currently under consideration at _Molecular Ecology_:  
+#### Alternative migratory tactics in brown trout (_Salmo trutta_) are underpinned by divergent regulation of metabolic but not neurological genes.  
+Robert Wynne, Louise C. Archer, Stephen A. Hutton, Luke Harman, Patrick Gargan, Peter A. Moran, Eileen Dillane, Jamie Coughlan, Thomas F. Cross, Philip McGinnity, Thomas J. Colgan and Thomas E. Reed 
 
 For the present analysis, the following steps were taken:  
 ### 1) Quality assessment:  
 Quality of raw Illumina reads was assessed using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).  
 ### 2) Transcript quantification:  
-Transcript quantification was performed using [salmon](https://salmon.readthedocs.io/en/latest/salmon.html).  
+Transcript quantification was performed using [Salmon](https://salmon.readthedocs.io/en/latest/salmon.html).  
 ### 3) Differential expression analyis:  
 Gene-level counts were calculated using [tximport](https://bioconductor.org/packages/release/bioc/html/tximport.html).  
 Differential expression analysis was performed using [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html).  
