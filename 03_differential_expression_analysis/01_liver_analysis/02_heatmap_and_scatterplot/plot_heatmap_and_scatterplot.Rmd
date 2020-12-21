@@ -34,7 +34,7 @@ dir.create(path = "results")
 2. Load data:
   
 ```{r, message = FALSE}
-load(file = "results/DESeq2_output_liver_for_heatmap.RData")
+load(file = "results/figures_for_ms/DESeq2_output_liver.RData")
 ```
 
 3. Examine count data:
