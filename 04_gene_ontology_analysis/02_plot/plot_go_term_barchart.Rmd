@@ -123,7 +123,7 @@ ggsave(file = paste(output_dir,
        width = 10)
 ```
 
-6. Run lintr:
+5. Run lintr:
 
 ```{r, message = FALSE}
 lintr::lint(file = "plot_go_term_barchart.Rmd")
