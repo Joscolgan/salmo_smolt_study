@@ -1,5 +1,14 @@
+--- 
+title: "Salmo smolt study"
+output: plot_figure_1_pca_result.html
+author: Joe Colgan (joscolgan)
+---
 
-
+## Introduction:  
+The purpose of this script is to:
+1) Load two PCA plots generated for transformed-gene level counts for brown trout liver and brain samples.
+2) Generate a combind plot.
+3) Output plot as a .pdf or .png file.
 
 1. Load libraries:
 
@@ -58,8 +67,8 @@ ggsave(file = "results/figures_for_ms/figure_1a_b_combined.pdf",
        width = 10)
 ```
 
-Run lintr:
+4. Run lintr:
 
 ```{r, message = FALSE}
-lintr::lint(file = "")
+lintr::lint(file = "plot_figure_1_pca_result.Rmd")
 ```
