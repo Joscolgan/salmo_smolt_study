@@ -1,6 +1,6 @@
 --- 
-title: "Salmo smoltification study"
-output: plot_heatmap_and_scatterplot.html
+title: "Salmo smolt study"
+output: plot_heatmap_and_scatterplot_brain.html
 author: Joe Colgan (joscolgan)
 ---
   
@@ -169,7 +169,7 @@ normalised_counts_ordered_melt$gene_name <-
          levels = rev(unique(c(as.character(unlist(normalised_counts_ordered_melt$gene_name))))))
 ```
 
-6. Plot heatmap:
+6. Generate heatmap:
   
 ```{r, message = FALSE}
 ## Assign the name of dataframe to plot:
@@ -243,10 +243,9 @@ ggsave(file = paste(output,
        width = 10)
 ```
 
-Below needs to be formatted:
+8. Generate scatterplot:
 
 ```{r, message = FALSE}
-###########################################################
 # Next bits are about generating a nice plot with means (as points) and SEs:
 phenotype <- gsub(pattern = "_.*",
                   replacement = "",
@@ -287,7 +286,6 @@ for (group in unique(input$phenotype)) {
         print(length(output_tmp))
         }
 }
-
 
 ## Update levels on scatterplot:
 combined_df$phenotype <- factor(combined_df$phenotype,
@@ -344,10 +342,8 @@ ggsave(file = "results/figures_for_ms/figure_2_heatmap_scatterplot.pdf",
        width = 15)
 ```
 
-Run lintr:
+9. Run lintr:
   
 ```{r, message = FALSE}
 lintr::lint(file = "plot_heatmap_and_scatterplot_liver.Rmd")
 ```
-
-
