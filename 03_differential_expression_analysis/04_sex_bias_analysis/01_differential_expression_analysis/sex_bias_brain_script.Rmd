@@ -258,5 +258,5 @@ save.image(file = "DESeq2_output_sex_effects_liver.RData")
 8. Run lintr:
 
 ```{r, message = FALSE}
-lintr::lint(file = "sex_bias_script.Rmd")
+lintr::lint(file = "sex_bias_brain_script.Rmd")
 ```
