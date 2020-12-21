@@ -1,5 +1,5 @@
 --- 
-title: "Salmo smoltification study"
+title: "Salmo smolt study"
 output: sex_bias_liver_script.html
 authors: Robert Wynne, Tom Reed, Joe Colgan (joscolgan)
 ---
@@ -258,5 +258,5 @@ save.image(file = "DESeq2_output_sex_effects_liver.RData")
 8. Run lintr:
 
 ```{r, message = FALSE}
-lintr::lint(file = "sex_bias_script.Rmd")
+lintr::lint(file = "sex_bias_liver_script.Rmd")
 ```
