@@ -1,6 +1,6 @@
 --- 
 title: "Salmo smolt study"
-output: run_deseq2_to_pca_liver.html
+output: run_deseq2_to_pca_brain.html
 authors: Robert Wynne, Tom Reed, Joe Colgan (joscolgan)
 ---  
 
