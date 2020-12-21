@@ -1,5 +1,5 @@
 --- 
-title: "Salmo smoltification study"
+title: "Salmo smolt study"
 output: sex_bias_brain_script.html
 authors: Robert Wynne, Tom Reed, Joe Colgan (joscolgan)
 ---
