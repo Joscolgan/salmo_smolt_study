@@ -1,4 +1,8 @@
-
+--- 
+title: "Salmo smolt study"
+output: annotate_supp_table.html
+authors: Robert Wynne, Tom Reed, Joe Colgan (joscolgan)
+---
 
 1. Load libraries:
 
