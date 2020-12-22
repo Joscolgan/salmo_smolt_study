@@ -334,12 +334,12 @@ plot_grid(heatmap_plot + theme(legend.justification = c(0,0)),
 
 ## Save image to file:
 ggsave(file = "results/figures_for_ms/figure_2_heatmap_scatterplot.png",
-       height = 8,
-       width = 15)
+       height = 6,
+       width = 10)
 
 ggsave(file = "results/figures_for_ms/figure_2_heatmap_scatterplot.pdf",
-       height = 10,
-       width = 15)
+       height = 6,
+       width = 10)
 ```
 
 9. Run lintr:
