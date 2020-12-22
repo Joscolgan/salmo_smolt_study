@@ -2,7 +2,7 @@
 
 Context & citation:  
 This repository contains scripts for the analysis of life-history genes in the brown trout _Salmo trutta_.  
-The manuscript detailing the results of this analysis are currently under consideration at _Molecular Ecology_:  
+The manuscript detailing the results of this analysis is:  
 ### Alternative migratory tactics in brown trout (_Salmo trutta_) are underpinned by divergent regulation of metabolic but not neurological genes.
 Robert Wynne, Louise C. Archer, Stephen A. Hutton, Luke Harman, Patrick Gargan, Peter A. Moran, Eileen Dillane, Jamie Coughlan, Thomas F. Cross, Philip McGinnity, Thomas J. Colgan and Thomas E. Reed 
 
@@ -19,7 +19,6 @@ For differentially expressed genes identified between and across treatments, Gen
 GO term database was constructed using datasets available from [Ensembl](https://www.ensembl.org/index.html).  
 ### 5) Plots:  
 Plots, such as barcharts and heatmaps, were generated using [ggpubr](https://cran.r-project.org/web/packages/ggpubr/index.html) and [ggplot2](https://ggplot2.tidyverse.org/).  
-For plots, such as Venn diagrams, [Eulerr](https://cran.r-project.org/web/packages/eulerr/index.html) was used.  
 
 Computational support was kindly provided by the [Irish Centre for High-End Computing (ICHEC)](https://www.ichec.ie/).  
 
