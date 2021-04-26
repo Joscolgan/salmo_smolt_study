@@ -63,6 +63,7 @@ ggsave(file = "results/figures_for_ms/figure_1a_b_combined.png",
 
 ## Save image and output in .PDF format:
 ggsave(file = "results/figures_for_ms/figure_1a_b_combined.pdf",
+       dpi = 600,
        height = 8,
        width = 10)
 ```
