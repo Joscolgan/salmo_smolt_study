@@ -239,6 +239,7 @@ saveRDS(object = heatmap_plot,
 ggsave(file = paste(output,
                     "heatmap_liver_phen_not_env_genes.pdf",
                     sep = ""),
+       dpi = 600,
        height = 6,
        width = 10)
 ```
@@ -254,7 +255,7 @@ phenotype <- gsub(pattern = "_.*",
 input$phenotype<- rep(phenotype,
                       each = length(phen_not_env_genes))
 
-sex <- gsub(pattern = "_[0-9]", replacement = "", sample_names)
+sex <- gsub(pattern = "[0-9]", replacement = "", sample_names)
 sex <- gsub(pattern = ".*_",
             replacement = "",
             sex)
@@ -305,7 +306,7 @@ scatterplot <- ggplot(data = combined_df,
         scale_fill_manual(values = c("green",
                           "white")) +
         theme_bw() +
-        ylab("Genes") +
+        ylab("Gene") +
         xlab("Normalised gene expression") +
         theme(strip.background = element_blank(),
               #strip.text.x = element_blank(),
@@ -338,6 +339,7 @@ ggsave(file = "results/figures_for_ms/figure_2_heatmap_scatterplot.png",
        width = 10)
 
 ggsave(file = "results/figures_for_ms/figure_2_heatmap_scatterplot.pdf",
+       dpi = 600,
        height = 6,
        width = 10)
 ```
