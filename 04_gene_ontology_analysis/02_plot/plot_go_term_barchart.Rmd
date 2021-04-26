@@ -121,6 +121,13 @@ ggsave(file = paste(output_dir,
                     sep = ""),
        height = 8,
        width = 10)
+       
+ggsave(file = paste(output_dir,
+                    "fig_3_go_terms_barchart_liver.pdf",
+                    sep = ""),
+       dpi = 600,
+       height = 8,
+       width = 10)
 ```
 
 5. Run lintr:
