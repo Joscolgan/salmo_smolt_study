@@ -240,6 +240,7 @@ saveRDS(object = heatmap_plot,
 ggsave(file = paste(output,
                     "heatmap_liver_phen_not_env_genes.pdf",
                     sep = ""),
+       dpi = 600,             
        height = 6,
        width = 10)
 ```
