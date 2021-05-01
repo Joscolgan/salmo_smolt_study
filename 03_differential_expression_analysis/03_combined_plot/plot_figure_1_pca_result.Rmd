@@ -60,6 +60,11 @@ ggarrange(liver_pca,
 ggsave(file = "results/figures_for_ms/figure_1a_b_combined.png",
        height = 5,
        width = 10)
+       
+ggsave(file = "results/figures_for_ms/figure_1a_b_combined.tiff",
+       dpi = 600,
+       height = 5,
+       width = 10)
 
 ## Save image and output in .PDF format:
 ggsave(file = "results/figures_for_ms/figure_1a_b_combined.pdf",
