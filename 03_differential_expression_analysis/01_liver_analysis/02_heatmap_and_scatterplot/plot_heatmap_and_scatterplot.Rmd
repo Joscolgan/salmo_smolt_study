@@ -226,8 +226,8 @@ output  <- "results/figures_for_ms/"
 ggsave(file = paste(output,
                     "heatmap_liver_phen_not_env_genes.png",
                     sep = ""),
-       height = 20,
-       width = 15)
+       height = 6,
+       width = 10)
 
 ## Save image as rds:
 saveRDS(object = heatmap_plot,
@@ -337,6 +337,11 @@ plot_grid(heatmap_plot + theme(legend.justification = c(0,0)),
 ggsave(file = "results/figures_for_ms/figure_2_heatmap_scatterplot.png",
        height = 6,
        width = 10)
+       
+ggsave(file = "results/figures_for_ms/figure_2_heatmap_scatterplot.tiff",
+       dpi = 600,
+       height = 6,
+       width = 10)       
 
 ggsave(file = "results/figures_for_ms/figure_2_heatmap_scatterplot.pdf",
        dpi = 600,
