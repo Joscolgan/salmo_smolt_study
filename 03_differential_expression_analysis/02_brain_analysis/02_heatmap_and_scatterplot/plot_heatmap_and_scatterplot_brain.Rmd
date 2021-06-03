@@ -50,7 +50,7 @@ normalised_counts_df <- as.data.frame(normalised_counts)
 sample_info <- read.table(file = "data/RNAseq_Sample_File_Reduced.txt",
                           header = TRUE)
 
-## Extract liver samples:
+## Extract brain samples:
 sample_info <- subset(x = sample_info,
                       tissue == "Brain")
 
