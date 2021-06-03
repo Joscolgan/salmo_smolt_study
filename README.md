@@ -24,5 +24,5 @@ Plots, such as barcharts and heatmaps, were generated using [ggpubr](https://cra
 
 Computational support was kindly provided by the [Irish Centre for High-End Computing (ICHEC)](https://www.ichec.ie/).  
 
-Some scripts contained in this repository are modifications of scripts used by [Colgan et el. (2019, Molecular Ecology)](https://onlinelibrary.wiley.com/doi/full/10.1111/mec.15047). If reusing scripts within the present repository, please cite the original source as well and follow instructions on reuse.
+Some scripts contained in this repository are modifications of scripts used by [Colgan et el. (2019, _Molecular Ecology_)](https://onlinelibrary.wiley.com/doi/full/10.1111/mec.15047). If reusing scripts within the present repository, please cite the original source as well and follow instructions on reuse.
 The original scripts are publically available at: https://github.com/wurmlab/Bter_neonicotinoid_exposure_experiment  
