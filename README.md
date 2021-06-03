@@ -3,7 +3,7 @@
 Context & citation:  
 This repository contains scripts for the analysis of putative life-history genes in the brown trout _Salmo trutta_.  
 The manuscript detailing the results of this analysis is:  
-### Alternative migratory tactics in brown trout (_Salmo trutta_) are underpinned by divergent regulation of metabolic but not neurological genes. _Ecology & Evolution_ (Accepted)
+### Alternative migratory tactics in brown trout (_Salmo trutta_) are underpinned by divergent regulation of metabolic but not neurological genes. _Ecology & Evolution_ [Link here](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.7664)
 Robert Wynne, Louise C. Archer, Stephen A. Hutton, Luke Harman, Patrick Gargan, Peter A. Moran, Eileen Dillane, Jamie Coughlan, Thomas F. Cross, Philip McGinnity, Thomas J. Colgan and Thomas E. Reed 
 
 For the present analysis, the following steps were taken:  
